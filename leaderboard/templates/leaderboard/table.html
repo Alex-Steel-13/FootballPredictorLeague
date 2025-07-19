@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+{% extends "base.html" %}
+
+{% block title %}Leaderboard{% endblock %}
+
+{% block content %}
+<html>
+<head>
+    <title>Leaderboard</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 80%;
+            margin: auto;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        h1 {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Chiswick Predictor League 2025/26</h1>
+
+    <table>
+        <tr>
+            <th>Rank</th>
+            <th>Name</th>
+            <th>Total Predictions</th>
+            <th>Points this week</th>
+            <th>Score</th>
+            <th>Average Points per game</th>
+            <th>Distance to first</th>
+            <th>Distance to position above</th>
+            <th>Distance to placed position</th>
+            <th>Perfect Predictions</th>
+            <th>Win Prediction Ratio</th>
+            <th>Position Last Week</th>
+            <th>Postponed Games</th>
+        </tr>
+
+        {% for entry in leaderboard %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ entry.user }}</td>
+            <td>{{ entry.number_of_predictions }}</td>
+            <td>{{ entry.postponed_games}}</td>
+            <td>{{ entry.points_this_week}} </td>
+            <td>{{ entry.score }}</td>
+            <td>{{ entry.average_points_per_game}}</td>
+            <td>{{ entry.distance_to_first }}</td>
+            <td>{{ entry.distance_to_position_above }}</td>
+            <td>{{ entry.distance_to_placed_position }}</td>
+            <td>{{ entry.perfect_predictions }}</td>
+            <td>{{ entry.win_prediction_ratio }}</td>
+            <td>{{ entry.position_last_week }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="6">No leaderboard entries yet.</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
+{% endblock %}

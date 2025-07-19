@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+
+<h1>This is the home page</h1>
+<a href="{% url 'predictions:upcoming_matches' %}">Upcoming Matches</a>
+<br>
+<a href="{% url 'leaderboard:leaderboard' %}">Leaderboard</a>
+<br>
+<a href="{% url 'leaderboard:predictions_this_week' %}">Predictions This Week</a>
+<br>
+<a href="{% url 'users:registration' %}">Register</a>
+<a href="{% url 'users:login' %}">Login</a>
+<a href="{% url 'users:logout' %}">Logout</a>
+
+{% endblock %}

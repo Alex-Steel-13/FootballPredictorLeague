@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Predict Match{% endblock %}
+
+{% block content %}
+
+<h1>Predict Match</h1>
+{% if messages %}
+    {% for message in messages %}
+        <li>{{ message }}</li>
+    {% endfor %}
+{% endif %}
+
+<form action = "{% url 'predictions:predict_match' match.id %}" method="post">
+    <h3>{{ match.match_date }}: {{ match.home_team }} vs {{ match.away_team }}</h3>
+    {% csrf_token %}
+    {{ form }}
+    <button type="submit">Submit Prediction</button>
+</form>
+
+{% endblock %}

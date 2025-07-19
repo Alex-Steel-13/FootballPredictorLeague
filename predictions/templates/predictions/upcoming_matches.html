@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+{% extends "base.html" %}
+
+{% block title %}Upcoming Matches{% endblock %}
+
+{% block content %}
+<html>
+<head>
+    <title>Upcoming Matches</title>
+</head>
+<body>
+    <h1>Upcoming Matches</h1>
+
+    {% for week_start, week_matches in matches %}
+        <h2>Match Week Starting: {{ week_start }}</h2>
+
+        {% regroup week_matches by league as league_groups %}
+
+        {% for league in league_groups %}
+            <h3>{{ league.grouper }}</h3>
+            <ul>
+                {% for match in league.list %}
+                    <li>
+                        <a href="{% url 'predictions:predict_match' match.id %}">
+                            {{ match.match_date }}: {{ match.home_team }} vs {{ match.away_team }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endfor %}
+
+    {% empty %}
+        <p>No upcoming matches.</p>
+    {% endfor %}
+</body>
+</html>
+{% endblock %}}

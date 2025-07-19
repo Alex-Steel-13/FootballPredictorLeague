@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Upcoming Matches{% endblock %}
+
+{% block content %}
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 10px;
+            margin-top: 20px;
+        }
+
+        .prediction {
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin: 15px 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .prediction strong {
+            font-size: 1.1rem;
+            color: #007bff;
+        }
+
+        .alert {
+            color: #d9534f;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        .past-match {
+            opacity: 0.6;
+            filter: grayscale(80%);
+        }
+
+
+        p {
+            margin: 5px 0;
+        }
+    </style>
+
+    <h1>Your Past Predictions</h1>
+
+    {% for match_week, predictions in output.items %} 
+        <h2>Match Week {{ match_week }}</h2>
+        {% for prediction in predictions %}
+            <div class="prediction">
+                <strong>{{ prediction.match.home_team }} vs {{ prediction.match.away_team }} on {{ prediction.match.match_date }}</strong>
+                <p>{{ prediction.predicted_home_score }} - {{ prediction.predicted_away_score }}</p>
+            {% empty %}
+                <p>You haven't predicted any matched in previous weeks</p>
+        {% endfor %}
+        </div>
+        {% empty %}
+            <p>You haven't predicted any matched in previous weeks</p>
+        {% endfor %}
+    {% endblock %}

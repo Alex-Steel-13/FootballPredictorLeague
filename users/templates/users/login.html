@@ -1,0 +1,7 @@
+<h2>User Login</h2>
+<form action="{% url 'users:login' %}" method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Submit</button>
+</form>
+<p>Already have an account? <a href="users/login/">Log in</a></p>

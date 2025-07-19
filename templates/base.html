@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}My Site{% endblock %}</title>
+    <style>
+        /* Basic Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        /* Navbar styles */
+        nav {
+            background-color: #333;
+            padding: 10px 20px;
+        }
+
+        /* Container for both nav sections */
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Shared styles for both nav lists */
+        .nav-left, .nav-right {
+            display: flex;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            gap: 20px;
+        }
+
+        /* Link styles */
+        .nav-left a,
+        .nav-right a,
+        .nav-left .nav-item,
+        .nav-right .nav-item {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 6px 12px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .nav-left a:hover,
+        .nav-right a:hover {
+            background-color: #555;
+        }
+
+        /* Main content */
+        .container {
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav>
+        <div class="nav-container">
+            <ul class="nav-left">
+                <li><a href="{% url 'leaderboard:leaderboard' %}">Home</a></li>
+                {% if user.is_authenticated %}
+                    <li><a href="{% url 'predictions:upcoming_matches' %}">Choose Predictions</a></li>
+                    <li><a href="{% url 'predictions:your_predictions' %}">Edit Your Predictions</a></li>
+                    <li><a href="{% url 'predictions:your_past_predictions' %}">Your Past Predictions</a></li>
+                    <li><a href="{% url 'leaderboard:predictions_this_week' %}">Everyone's Predictions This Week</a></li>
+                    
+                {% endif %}
+            </ul>
+            <ul class="nav-right">
+                {% if user.is_authenticated %}
+                    <li><span class="nav-item">{{ user }}</span></li>
+                    <li><a href="{% url 'users:logout' %}">Logout</a></li>
+                    {% if user.is_superuser %}
+                        <li><a href="{% url 'admin:index' %}">Admin</a></li>
+                    {% endif %}
+                {% else %}
+                    <li><a href="{% url 'users:login' %}">Login</a></li>
+                    <li><a href="{% url 'users:registration' %}">Register</a></li>
+                {% endif %}
+            </ul>
+        </div>
+</nav>
+
+
+    <!-- Page Content -->
+    <div class="container">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+</body>
+</html>
