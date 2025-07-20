@@ -1,12 +1,15 @@
 OVERALL:
 2. Add on home page message for telling people to predict (its now in the your predictions page)
- 
 4. Ties on leaderboard - win prediction ranking then perfect prediction
 
 
-1. Edit your prediction page to sort by match week, and notify if not full
-
+1. Edit your prediction page to sort by match week, and notify if not full - sorted based on match weeks
+2. Add a page for previous predictions - done
+3. Show everyone's predictions on a saturday - done
+4. lock predicting matches on saturday 00:00 - done
+5. Add to nav bar a sign to say you are logged in - done
+6. Backup database
 
 Completed
-1. Predictions this week page only shows on sunday - done
-3. Display previous predictions - ability to delete predictions if in the future - ALL DONE
+1. Predictions this week page only shows on saturday - done
+3. Display previous predictions - ability to delete predictions if in the future - ALL DONE 
