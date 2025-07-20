@@ -41,8 +41,6 @@ INSTALLED_APPS = [
     'predictions',  # Custom app for handling predictions
     'users', #accounts
     'leaderboard',
-    "celery",
-    "django_celery_beat"
 ]
 
 MIDDLEWARE = [
