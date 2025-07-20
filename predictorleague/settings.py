@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-u=_)#aprhi$n1#d$a3)1u4n3vre__tzz&_0n^x_5*l^yge!r$%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["footballpredictorleague.onrender.com"]
 
 
 # Application definition
