@@ -1,2 +1,6 @@
 gunicorn
 django >= 3.2
+requests
+bs4
+pandas
+html5lib
