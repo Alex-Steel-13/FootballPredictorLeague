@@ -1,6 +1,7 @@
 gunicorn
-django >= 3.2
+Django >= 3.2
 requests
-bs4
+beautifulsoup4
 pandas
 html5lib
+whitenoise>=6.6.0
