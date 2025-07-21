@@ -105,19 +105,19 @@ urls = {
     "Scottish_League_2": "https://www.footballwebpages.co.uk/scottish-league-two/fixtures-results"
     }
 
-def run():
-    data = []
-    for key,value in urls.items():
-        result = scrape_data(value, key)
-        if isinstance(result, list):
-            data.extend(result)  # Add each item from the list individually
-        else:
-            data.append(result)  # Just a single dictionary
-    
-    for row in data:
-            Match.objects.create(
-                home_team = row["Home"],
-                away_team = row["Away"],
-                match_date = row["Date"],
-                league = row["League"]
-            )
+
+data = []
+for key,value in urls.items():
+    result = scrape_data(value, key)
+    if isinstance(result, list):
+        data.extend(result)  # Add each item from the list individually
+    else:
+        data.append(result)  # Just a single dictionary
+
+for row in data:
+        Match.objects.create(
+            home_team = row["Home"],
+            away_team = row["Away"],
+            match_date = row["Date"],
+            league = row["League"]
+        )
