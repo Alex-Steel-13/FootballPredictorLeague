@@ -54,7 +54,6 @@
             <td>{{ forloop.counter }}</td>
             <td>{{ entry.user }}</td>
             <td>{{ entry.number_of_predictions }}</td>
-            <td>{{ entry.postponed_games}}</td>
             <td>{{ entry.points_this_week}} </td>
             <td>{{ entry.score }}</td>
             <td>{{ entry.average_points_per_game}}</td>
@@ -64,6 +63,7 @@
             <td>{{ entry.perfect_predictions }}</td>
             <td>{{ entry.win_prediction_ratio }}</td>
             <td>{{ entry.position_last_week }}</td>
+            <td>{{ entry.postponed_games}}</td>
         </tr>
         {% empty %}
         <tr>

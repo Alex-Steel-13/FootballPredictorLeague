@@ -13,6 +13,7 @@ class Match(models.Model):
     away_score = models.IntegerField(null=True, blank=True)
     league = models.CharField(max_length=100, default = "")
     predicted = models.BooleanField(default=False)
+    postponed = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.home_team} vs {self.away_team} on {self.match_date}"

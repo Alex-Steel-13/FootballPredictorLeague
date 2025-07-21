@@ -5,6 +5,7 @@ from predictions.models import Prediction
 from datetime import timedelta
 import datetime
 from django.utils import timezone
+from operator import itemgetter
 
 # Create your views here.
 def leaderboard(request):
@@ -13,6 +14,8 @@ def leaderboard(request):
     leaderboard = []
 
     predictions = Prediction.objects.all()
+
+
 
     for prediction in predictions:
         #Adds the user into the leaderboard
@@ -29,7 +32,8 @@ def leaderboard(request):
                                 "win_prediction_ratio": 0, 
                                 "position_last_week": 0, 
                                 "correct_winner": 0,
-                                "distance_to_placed_position": 0})
+                                "distance_to_placed_position": 0,
+                                "points_from_previous_weeks":0})
         for entry in leaderboard:
             if prediction.user == entry["user"]:
                 #increases the number of predictions by 1
@@ -46,26 +50,35 @@ def leaderboard(request):
                 #Adds one if predicts correct winner, needed for other stat
                 if prediction_points != 0:
                     entry["correct_winner"] += 1
+                #points this week
+                match_date = prediction.match.match_date
+                start_date = make_previous_friday(today).date()
+                end_date = (start_date + datetime.timedelta(days=6))
+                if start_date <= match_date <= end_date:
+                    entry["points_this_week"] += prediction_points
+                #postponed games
+                if prediction.match.postponed:
+                    entry["postponed_games"] += 1
+                
+                if get_match_week_start(prediction.match.match_date) <= get_match_week_start((today) - timedelta(days=7)).date():
+                    entry["points_from_previous_weeks"] += prediction_points
+                
+
     
     #ordering
-    leaderboard.sort(key = lambda entry: entry["score"])
-    """
-    for entry in leaderboard.sort(key = lambda entry: entry["score"]):
-        #here to do dealing with ties
-        break
-    """
+    sorted_leaderboard = order_leaderboard(leaderboard)
 
 
         
     #new loop for stats that don't need a prediction
-    for entry in leaderboard:
+    for entry in sorted_leaderboard:
         entry["average_points_per_game"] = round(entry["score"] / entry["number_of_predictions"])
-        entry["win_prediction_ratio"] = round(entry["correct_winner"] / entry["number_of_predictions"], 2)
-        entry["distance_to_first"] = leaderboard[0]["score"] - entry["score"]
-        entry["distance_to_position_above"] = 0 if leaderboard.index(entry) == 0 else (leaderboard[leaderboard.index(entry) - 1]["score"] - entry["score"])
-        entry["distance_to_placed_position"] = 0 if leaderboard.index(entry) <= 2 else (leaderboard[2]["score"] - entry["score"])    
+        entry["win_prediction_ratio"] = str(round(entry["correct_winner"] / entry["number_of_predictions"], 2)*100) + "%"
+        entry["distance_to_first"] = sorted_leaderboard[0]["score"] - entry["score"]
+        entry["distance_to_position_above"] = 0 if sorted_leaderboard.index(entry) == 0 else (sorted_leaderboard[sorted_leaderboard.index(entry) - 1]["score"] - entry["score"])
+        entry["distance_to_placed_position"] = 0 if sorted_leaderboard.index(entry) <= 2 else (sorted_leaderboard[2]["score"] - entry["score"])    
 
-    return render(request, "leaderboard/table.html", {"leaderboard": leaderboard})
+    return render(request, "leaderboard/table.html", {"leaderboard": sorted_leaderboard})
 
 def check_user_in_leaderboard(prediction, leaderboard):
     user = prediction.user
@@ -121,3 +134,10 @@ def get_match_week_start(d):
 def make_previous_saturday(d):
     days_to_subtract = (d.weekday() - 5) % 7
     return d - datetime.timedelta(days=days_to_subtract)
+
+def make_previous_friday(d):
+    days_to_subtract = (d.weekday() - 4) % 7
+    return d - datetime.timedelta(days=days_to_subtract)
+
+def order_leaderboard(leaderboard):
+    return sorted(leaderboard, key=itemgetter("score", "win_prediction_ratio", "perfect_predictions"))

@@ -16,10 +16,23 @@
 
         {% regroup week_matches by league as league_groups %}
 
-        {% for league in league_groups %}
-            <h3>{{ league.grouper }}</h3>
+        {% if league_groups %}
+            {% for league in league_groups %}
+                <h3>{{ league.grouper }}</h3>
+                <ul>
+                    {% for match in league.list %}
+                        <li>
+                            <a href="{% url 'predictions:predict_match' match.id %}">
+                                {{ match.match_date }}: {{ match.home_team }} vs {{ match.away_team }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endfor %}
+        {% else %}
+            <p>No grouped matches found, but there are ungrouped matches:</p>
             <ul>
-                {% for match in league.list %}
+                {% for match in week_matches %}
                     <li>
                         <a href="{% url 'predictions:predict_match' match.id %}">
                             {{ match.match_date }}: {{ match.home_team }} vs {{ match.away_team }}
@@ -27,7 +40,7 @@
                     </li>
                 {% endfor %}
             </ul>
-        {% endfor %}
+        {% endif %}
 
     {% empty %}
         <p>No upcoming matches.</p>

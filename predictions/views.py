@@ -58,7 +58,7 @@ def upcoming_matches(request):
     #to lock the predictions on saturday, will remove the rest of that matchweek
     if today.weekday() == 0 or today.weekday() >= 5:
         value = match_dict.pop(get_match_week_start(today),None)
-    return render(request, 'predictions/upcoming_matches.html', {'matches': match_dict.items()})
+    return render(request, 'predictions/upcoming_matches.html', {'matches': sorted(match_dict.items())})
 
 def get_match_week_start(d):
     """Returns the Friday of the week the date falls in (Friday–Monday window)."""
@@ -160,9 +160,12 @@ def edit_prediction(request, prediction_id):
     prediction = get_object_or_404(Prediction, id=prediction_id, user=request.user)
 
     if request.method == "POST":
-        form = forms.EditPredictionForm(request.POST)
+        form = forms.EditPredictionForm(request.POST, instance=prediction)
         if form.is_valid():
-            form.save()
+            print(prediction.user)
+            prediction = form.save(commit=False)
+            prediction.user = request.user
+            prediction.save()
             return redirect("predictions:your_predictions")
     else:
         form = forms.EditPredictionForm(instance=prediction)
