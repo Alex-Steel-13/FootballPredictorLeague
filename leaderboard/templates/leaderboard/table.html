@@ -27,6 +27,29 @@
         h1 {
             text-align: center;
         }
+        td:nth-child(5) {
+            font-weight: bold;
+        }
+        .top-player {
+            background-color: #B8860B;
+        }
+        .second-player {
+            background-color: #DAA520;
+        }
+        .third-player {
+            background-color: #FFD700;
+        }
+        .fourth-player {
+            background-color: #FFEB7F;
+        }
+        .fifth-player {
+            background-color: #FFF8DC;
+        }
+        .bottom-player {
+            background-color: #4B3621;
+            color: white;
+        }
+
     </style>
 </head>
 <body>
@@ -38,19 +61,19 @@
             <th>Name</th>
             <th>Total Predictions</th>
             <th>Points this week</th>
-            <th>Score</th>
+            <th>TOTAL POINTS</th>
             <th>Average Points per game</th>
             <th>Distance to first</th>
-            <th>Distance to position above</th>
             <th>Distance to placed position</th>
-            <th>Perfect Predictions</th>
+            <th>Distance to position above</th>
+            <th>Correct Predictions</th>
             <th>Win Prediction Ratio</th>
             <th>Position Last Week</th>
             <th>Postponed Games</th>
         </tr>
 
         {% for entry in leaderboard %}
-        <tr>
+        <tr class="{% if forloop.counter == 1 %}top-player{% elif forloop.counter == 2 %}second-player{% elif forloop.counter == 3 %}third-player{% elif forloop.counter == 4 %}fourth-player{% elif forloop.counter == 5 %}fifth-player{% elif forloop.last %}bottom-player{% endif %}">
             <td>{{ forloop.counter }}</td>
             <td>{{ entry.user }}</td>
             <td>{{ entry.number_of_predictions }}</td>
@@ -58,8 +81,8 @@
             <td>{{ entry.score }}</td>
             <td>{{ entry.average_points_per_game}}</td>
             <td>{{ entry.distance_to_first }}</td>
-            <td>{{ entry.distance_to_position_above }}</td>
             <td>{{ entry.distance_to_placed_position }}</td>
+            <td>{{ entry.distance_to_position_above }}</td>
             <td>{{ entry.perfect_predictions }}</td>
             <td>{{ entry.win_prediction_ratio }}</td>
             <td>{{ entry.position_last_week }}</td>

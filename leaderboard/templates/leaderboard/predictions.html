@@ -1,59 +1,62 @@
 <!DOCTYPE html>
-{% extends "base.html" %}
-
-{% block title %}Predictions This Week{% endblock %}
-
+{% extends "base.html" %} {% block title %}Predictions This Week{% endblock %}
 {% block content %}
 <html>
-<head>
+  <head>
     <title>Predictions This Week</title>
     <style>
-        table {
-            border-collapse: collapse;
-            margin: 0 auto;
-            width: 90%;
-        }
+      table {
+        border-collapse: collapse;
+        margin: 0 auto;
+        width: 90%;
+      }
 
-        th, td {
-            border: 1px solid #ccc;
-            padding: 10px;
-            text-align: center;
-        }
+      th,
+      td {
+        border: 1px solid #ccc;
+        padding: 10px;
+        text-align: center;
+      }
 
-        th {
-            background-color: #f2f2f2;
-        }
+      th {
+        background-color: #f2f2f2;
+      }
 
-        h1 {
-            text-align: center;
-        }
+      h1 {
+        text-align: center;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <h1>Predictions This Week</h1>
 
     {% if predictions %}
-        <table>
-            <thead>
-                <tr>
-                    <th>User</th>
-                    <th>Match</th>
-                    <th>Predicted Score</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for prediction in predictions|dictsort:"user.username" %}
-                    <tr>
-                        <td>{{ prediction.user.username }}</td>
-                        <td>{{ prediction.match.home_team }} vs {{ prediction.match.away_team }}</td>
-                        <td>{{ prediction.predicted_home_score }} - {{ prediction.predicted_away_score }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <table>
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Match</th>
+          <th>Predicted Score</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for prediction in predictions|dictsort:"user.username" %}
+        <tr>
+          <td>{{ prediction.user.username }}</td>
+          <td>
+            {{ prediction.match.home_team }} vs {{ prediction.match.away_team }}
+          </td>
+          <td>
+            {{ prediction.predicted_home_score }} - {{prediction.predicted_away_score }}
+          </td>
+        </tr>
+
+        {% endfor %}
+      </tbody>
+    </table>
     {% else %}
-        <p style="text-align: center;">No predictions made this week.</p>
+    <p style="text-align: center">No predictions made this week.</p>
     {% endif %}
-</body>
+  </body>
 </html>
 {% endblock %}

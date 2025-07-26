@@ -78,12 +78,14 @@
             </ul>
             <ul class="nav-right">
                 {% if user.is_authenticated %}
+                    <li><a href="{% url 'info' %}">Info</a></li>
                     <li><span class="nav-item">{{ user }}</span></li>
                     <li><a href="{% url 'users:logout' %}">Logout</a></li>
                     {% if user.is_superuser %}
                         <li><a href="{% url 'admin:index' %}">Admin</a></li>
                     {% endif %}
                 {% else %}
+                    <li><a href="{% url 'info' %}">Info</a></li>
                     <li><a href="{% url 'users:login' %}">Login</a></li>
                     <li><a href="{% url 'users:registration' %}">Register</a></li>
                 {% endif %}

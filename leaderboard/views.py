@@ -7,9 +7,10 @@ import datetime
 from django.utils import timezone
 from operator import itemgetter
 
+
 # Create your views here.
+
 def leaderboard(request):
-    leaderboard_entry = {"user", "number_of_predictions", "postponed_games", "points_this_week", "score", "average_points_per_game", "distance_to_first", "distance_to_position_above", "perfect_predictions", "win_prediction_ratio", "position_last_week", "correct_winner", "distance_to_placed_position"}
     today = timezone.now()
     leaderboard = []
 
@@ -76,7 +77,7 @@ def leaderboard(request):
         entry["win_prediction_ratio"] = str(round(entry["correct_winner"] / entry["number_of_predictions"], 2)*100) + "%"
         entry["distance_to_first"] = sorted_leaderboard[0]["score"] - entry["score"]
         entry["distance_to_position_above"] = 0 if sorted_leaderboard.index(entry) == 0 else (sorted_leaderboard[sorted_leaderboard.index(entry) - 1]["score"] - entry["score"])
-        entry["distance_to_placed_position"] = 0 if sorted_leaderboard.index(entry) <= 2 else (sorted_leaderboard[2]["score"] - entry["score"])    
+        entry["distance_to_placed_position"] = 0 if sorted_leaderboard.index(entry) <= 4 else (sorted_leaderboard[4]["score"] - entry["score"])    
 
     return render(request, "leaderboard/table.html", {"leaderboard": sorted_leaderboard})
 
@@ -91,12 +92,22 @@ def evaluate_score(prediction):
     score = 0
     if prediction.match.home_score == None or prediction.match.away_score == None:
         return score
+    
     home_team_won = home_won(prediction.match.home_score, prediction.match.away_score)
     predicted_home_won = home_won(prediction.predicted_home_score, prediction.predicted_away_score)
     if home_team_won and predicted_home_won:
         score += 50
-    elif not(home_team_won) and not(predicted_home_won):
+    
+    actual_draw = draw(prediction.match.home_score, prediction.match.away_score)
+    predicted_draw = draw(prediction.predicted_home_score, prediction.predicted_away_score)
+    if actual_draw and predicted_draw:
         score += 75
+    
+    away_team_won = away_won(prediction.match.home_score, prediction.match.away_score)
+    predicted_away_won = away_won(prediction.predicted_home_score, prediction.predicted_away_score)
+    if away_team_won and predicted_away_won:
+        score += 75
+
     if prediction.predicted_home_score == prediction.match.home_score and prediction.predicted_away_score == prediction.match.away_score:
         score +=50
     return score
@@ -104,16 +115,33 @@ def evaluate_score(prediction):
 def home_won(home_score, away_score):
     if home_score > away_score:
         return True
+    else:
+        return False
+
+def draw(home_score, away_score):
+    return home_score == away_score
+
+def away_won(home_score, away_score):
+    if home_score < away_score:
+        return True
+    else:
+        return False
 
 
 def predictions(request):
     predictions = Prediction.objects.select_related("match")
-    match_week = get_match_week_start(make_previous_saturday(timezone.now().date()))
+    today = timezone.now().date()
+    #ADFADSFADSFADF
+    #ADFADFASDFASDFASDFADFASDFASDF
+    today = timezone.datetime(2025,8,3).date()#PLEASE REMEMBER TO DELETE THIS OMG THIS IS FOR TESTING ASLKD;FA;LDSKJA;DSLF
+    #ASSDFAFHSGHJSDFGSFHG
+    #SDFGSFHSRHNHSRTN
+    match_week = get_match_week_start(make_previous_saturday(today)) 
     predictions_this_week = []
     for prediction in predictions:
         if match_week == get_match_week_start(prediction.match.match_date):
             predictions_this_week.append(prediction)
-    
+    predictions_this_week.sort(key= lambda x: x.user.username.lower())
 
     return render(request, "leaderboard/predictions.html", {"predictions": predictions_this_week})
 
@@ -140,4 +168,4 @@ def make_previous_friday(d):
     return d - datetime.timedelta(days=days_to_subtract)
 
 def order_leaderboard(leaderboard):
-    return sorted(leaderboard, key=itemgetter("score", "win_prediction_ratio", "perfect_predictions"))
+    return sorted(leaderboard, key=itemgetter("score", "win_prediction_ratio", "perfect_predictions"), reverse=True)
