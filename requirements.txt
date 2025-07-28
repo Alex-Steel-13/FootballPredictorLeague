@@ -5,3 +5,5 @@ beautifulsoup4
 pandas
 html5lib
 whitenoise>=6.6.0
+mysqlclient
+pymysql
