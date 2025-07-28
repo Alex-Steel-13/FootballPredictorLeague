@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 import datetime
+from predictorleague import settings
 
 # Create your models here.
 
@@ -20,7 +21,7 @@ class Match(models.Model):
 
 class Prediction(models.Model):
     #creates a key for the user and the match they predicted
-    user = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default=None)
     match = models.ForeignKey(Match, on_delete=models.CASCADE)
     predicted_home_score = models.IntegerField()
     predicted_away_score = models.IntegerField()
@@ -35,7 +36,7 @@ class Prediction(models.Model):
         #User predicts a match only once
         if Prediction.objects.filter(user = self.user, match=self.match).exclude(pk=self.pk).exists():
             raise ValidationError("You have already predicted this match")
-    
+
     def error(self):
         date = datetime.date.today()
 
@@ -46,7 +47,7 @@ class Prediction(models.Model):
         #User predicts a match only once
         if Prediction.objects.filter(user = self.user, match=self.match).exclude(pk=self.pk).exists():
             return "you have already predicted this match"
-        
+
 
 
     def __str__(self):

@@ -1,8 +1,23 @@
+import os
+import django
+import sys
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+
+os.environ['DJANGO_SETTINGS_MODULE'] = 'predictorleague.settings'
+django.setup()
+
+
+from predictions.models import Match
+
+
+
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 import datetime
-from predictions.models import Match
+
+
 
 def get_rows(base_URL, month):
     URL =base_URL + "/" + month
@@ -22,7 +37,7 @@ def split_match(match):
         return (home, away)
     except:
         return (match, None)
-    
+
 def convert_datetime(input):
     parts = input.split(" ")
     return datetime.date(int(parts[3]), int(month_to_number(parts[2])), int(parts[1][:-2]))
@@ -63,7 +78,7 @@ def scrape_data(url, league):
     elif month_int == 12:
         month = number_to_month(2)
     print(month)
-    
+
     unsorted_rows = get_rows(url, month)
     print(unsorted_rows[0])
 
@@ -71,7 +86,7 @@ def scrape_data(url, league):
     current_date = ""
     adding = False
 
-    
+
     for row in unsorted_rows:
         class_row = row.get("class", [])
         if "title" in row.get("class", []):
@@ -83,7 +98,7 @@ def scrape_data(url, league):
             continue
         elif "spacer" in row.get("class", []):
             adding = False
-        
+
         if adding:
             schedule[current_date].append(split_match(row.get("title")))
     result =[]
