@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-u=_)#aprhi$n1#d$a3)1u4n3vre__tzz&_0n^x_5*l^yge!r$%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["footballpredictorleague.onrender.com", '127.0.0.1:8000', '127.0.0.1']
+ALLOWED_HOSTS = ['www.chiswickpredictorleague.co.uk', '127.0.0.1:8000', '127.0.0.1']
 
 
 # Application definition
@@ -97,7 +97,7 @@ DATABASES = {
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
-    
+
 ]
 
 
