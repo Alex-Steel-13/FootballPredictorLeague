@@ -129,3 +129,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Accounts
 LOGIN_REDIRECT_URL = '/predict/upcoming/'
 LOGOUT_REDIRECT_URL = '/accounts/login/'
+
+AUTH_USER_MODEL = "users.CustomUser"

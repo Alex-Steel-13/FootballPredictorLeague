@@ -20,6 +20,8 @@ def leaderboard(request):
 
     for prediction in predictions:
         #Adds the user into the leaderboard
+        if not prediction.user.can_participate:
+            continue
         if not(check_user_in_leaderboard(prediction, leaderboard)):
             leaderboard.append({"user":prediction.user, 
                                 "number_of_predictions": 0, 
