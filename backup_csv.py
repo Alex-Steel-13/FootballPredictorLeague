@@ -1,5 +1,9 @@
 import pandas as pd
 from predictions.models import Prediction
+from datetime import datetime
+from django.core.mail import EmailMessage
+from django.conf import settings
+
 
 data = {"Date": [],
         "User": [],
@@ -24,4 +28,17 @@ for prediction in Prediction.objects.all():
 # Create DataFrame and save to CSV
 df = pd.DataFrame(data)
 df.to_csv("predictions_backup.csv", index=False)
-    
+
+subject = 'Automated Database CSV'
+body = 'Please find the attached database export for this week.'
+from_email = settings.EMAIL_HOST_USER
+to_email = ['michaelrsteel@gmail.com', 'alexandersteel12@gmail.com']
+
+email = EmailMessage(subject, body, from_email, to_email)
+
+# Attach your CSV file (assuming it's saved locally)
+with open('predictions_backup.csv', 'rb') as f:
+    email.attach('database_backup.csv', f.read(), 'text/csv')
+
+email.send()
+

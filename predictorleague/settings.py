@@ -138,3 +138,10 @@ LOGIN_REDIRECT_URL = '/predict/upcoming/'
 LOGOUT_REDIRECT_URL = '/accounts/login/'
 
 AUTH_USER_MODEL = "users.CustomUser"
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'alexandersteel12@gmail.com'
+EMAIL_HOST_PASSWORD = 'enqz ocit wsao squq'
