@@ -174,7 +174,16 @@ def edit_prediction(request, prediction_id):
 @login_required(login_url="/users/login/")
 def delete_prediction(request, prediction_id):
     prediction = get_object_or_404(Prediction, id=prediction_id, user=request.user)
+    predictions = Prediction.objects.all()
 
     if request.method == 'POST':
+        match = prediction.match
         prediction.delete()
+        other_has_predicted = False
+        for p in predictions:
+            if p.match == match:
+                other_has_predicted = True
+        if not other_has_predicted:
+            match.predicted = False
+            match.save()
         return redirect('predictions:upcoming_matches')
