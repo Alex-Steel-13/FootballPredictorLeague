@@ -133,11 +133,6 @@ def away_won(home_score, away_score):
 def predictions(request):
     predictions = Prediction.objects.select_related("match")
     today = timezone.now().date()
-    #ADFADSFADSFADF
-    #ADFADFASDFASDFASDFADFASDFASDF
-    today = timezone.datetime(2025,8,3).date()#PLEASE REMEMBER TO DELETE THIS OMG THIS IS FOR TESTING ASLKD;FA;LDSKJA;DSLF
-    #ASSDFAFHSGHJSDFGSFHG
-    #SDFGSFHSRHNHSRTN
     match_week = get_match_week_start(make_previous_saturday(today)) 
     predictions_this_week = []
     for prediction in predictions:
