@@ -37,6 +37,7 @@
           <th>User</th>
           <th>Match</th>
           <th>Predicted Score</th>
+          <th>Actual Score</th>
         </tr>
       </thead>
       <tbody>
@@ -48,6 +49,9 @@
           </td>
           <td>
             {{ prediction.predicted_home_score }} - {{prediction.predicted_away_score }}
+          </td>
+          <td>
+            {{ prediction.match.home_score }} - {{prediction.match.away_score }}
           </td>
         </tr>
 
