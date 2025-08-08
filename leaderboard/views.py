@@ -40,7 +40,7 @@ def leaderboard(request):
         for entry in leaderboard:
             if prediction.user == entry["user"]:
                 #increases the number of predictions by 1
-                if not prediction.match.home_score:
+                if not (prediction.match.home_score is None):
                     entry["number_of_predictions"] += 1
                 #increases score
                 prediction_points = evaluate_score(prediction)
