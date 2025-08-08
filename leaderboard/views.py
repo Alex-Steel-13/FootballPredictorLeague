@@ -76,8 +76,8 @@ def leaderboard(request):
         
     #new loop for stats that don't need a prediction
     for entry in sorted_leaderboard:
-        entry["average_points_per_game"] = round(entry["score"] / entry["number_of_predictions"])
-        entry["win_prediction_ratio"] = str(round(entry["correct_winner"] / entry["number_of_predictions"], 2)*100) + "%"
+        entry["average_points_per_game"] =  round(entry["score"] / entry["number_of_predictions"]) if entry["number_of_predictions"] else 0
+        entry["win_prediction_ratio"] = str(round(entry["correct_winner"] / entry["number_of_predictions"], 2)*100) + "%" if entry["number_of_predictions"] else 0
         entry["distance_to_first"] = sorted_leaderboard[0]["score"] - entry["score"]
         entry["distance_to_position_above"] = 0 if sorted_leaderboard.index(entry) == 0 else (sorted_leaderboard[sorted_leaderboard.index(entry) - 1]["score"] - entry["score"])
         entry["distance_to_placed_position"] = 0 if sorted_leaderboard.index(entry) <= 4 else (sorted_leaderboard[4]["score"] - entry["score"])    
