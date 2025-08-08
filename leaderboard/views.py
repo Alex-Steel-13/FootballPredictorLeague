@@ -110,7 +110,7 @@ def leaderboard(request):
             entry["perfect_predictions"],
             cor_min,
             cor_max,
-            [(0, 85, 60), (240, 85, 60)]
+            [(0, 85, 60), (240, 85, 60), fixed_hue=True]
 )
     return render(request, "leaderboard/table.html", {"leaderboard": sorted_leaderboard})
 
@@ -198,38 +198,20 @@ def make_previous_friday(d):
 def order_leaderboard(leaderboard):
     return sorted(leaderboard, key=itemgetter("score", "perfect_predictions", "win_prediction_ratio"), reverse=True)
 
-def scale_color(value, vmin, vmax, colors):
-    """
-    value: number to color
-    vmin/vmax: range for scaling
-    colors: list of (hue, saturation, lightness) tuples for stops
-    """
+def scale_color(value, vmin, vmax, start_hue, end_hue, fixed_hue=False):
     try:
         t = (float(value) - vmin) / (vmax - vmin) if vmax != vmin else 0
     except (TypeError, ValueError):
         t = 0
     t = max(0, min(1, t))
 
-    if len(colors) == 2:
-        # Simple 2-color gradient
-        (h1, s1, l1), (h2, s2, l2) = colors
-        hue = h1 + t * (h2 - h1)
-        sat = s1 + t * (s2 - s1)
-        lig = l1 + t * (l2 - l1)
-        return f"hsl({hue:.0f}, {sat:.0f}%, {lig:.0f}%)"
-
-    elif len(colors) == 3:
-        # 3-color gradient — split at t=0.5
-        if t <= 0.5:
-            # interpolate between color 0 and 1
-            t2 = t / 0.5
-            (h1, s1, l1), (h2, s2, l2) = colors[0], colors[1]
-        else:
-            # interpolate between color 1 and 2
-            t2 = (t - 0.5) / 0.5
-            (h1, s1, l1), (h2, s2, l2) = colors[1], colors[2]
-
-        hue = h1 + t2 * (h2 - h1)
-        sat = s1 + t2 * (s2 - s1)
-        lig = l1 + t2 * (l2 - l1)
-        return f"hsl({hue:.0f}, {sat:.0f}%, {lig:.0f}%)"
+    if fixed_hue:
+        # Keep hue fixed, vary lightness
+        hue = start_hue  # use start_hue as the fixed hue
+        sat = 85
+        lightness = 90 - (t * 50)  # 90% (light) → 40% (dark)
+        return f"hsl({hue}, {sat}%, {lightness}%)"
+    else:
+        # Interpolate hue normally
+        hue = start_hue + t * (end_hue - start_hue)
+        return f"hsl({hue:.0f}, 85%, 60%)"
