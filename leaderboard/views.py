@@ -36,7 +36,9 @@ def leaderboard(request):
                                 "position_last_week": 0, 
                                 "correct_winner": 0,
                                 "distance_to_placed_position": 0,
-                                "points_from_previous_weeks":0})
+                                "points_from_previous_weeks":0,
+                                "wb_color": "hsl(0, 0, 0)",
+                                "cp_color": "hsl(0, 0, 0)"})
         for entry in leaderboard:
             if prediction.user == entry["user"]:
                 #increases the number of predictions by 1
@@ -75,13 +77,41 @@ def leaderboard(request):
 
         
     #new loop for stats that don't need a prediction
+    pts_min = 1000000000000
+    pts_max = 0
+    cor_min = 1000000000000
+    cor_max = 0
     for entry in sorted_leaderboard:
+        if entry["points_this_week"] > pts_max:
+            pts_max = entry["points_this_week"]
+        if entry["perfect_predictions"] > cor_max:
+            cor_max = entry["perfect_predictions"]
+        if entry["points_this_week"] < pts_min:
+            pts_min = entry["points_this_week"]
+        if entry["perfect_predictions"] < cor_min:
+            cor_min = entry["perfect_predictions"]
         entry["average_points_per_game"] =  round(entry["score"] / entry["number_of_predictions"]) if entry["number_of_predictions"] else 0
         entry["win_prediction_ratio"] = str(round(entry["correct_winner"] / entry["number_of_predictions"], 2)*100) + "%" if entry["number_of_predictions"] else 0
         entry["distance_to_first"] = sorted_leaderboard[0]["score"] - entry["score"]
         entry["distance_to_position_above"] = 0 if sorted_leaderboard.index(entry) == 0 else (sorted_leaderboard[sorted_leaderboard.index(entry) - 1]["score"] - entry["score"])
         entry["distance_to_placed_position"] = 0 if sorted_leaderboard.index(entry) <= 4 else (sorted_leaderboard[4]["score"] - entry["score"])    
 
+
+    #time to do colours
+
+    for entry in sorted_leaderboard:
+        entry["wb_color"] = scale_color(
+            entry["points_this_week"], 
+            pts_min,
+            pts_max,
+            [(0, 85, 60), (60, 85, 60), (120, 85, 60)]
+        )
+        entry["cp_color"] = scale_color(
+            entry["perfect_predictions"],
+            cor_min,
+            cor_max,
+            [(0, 85, 60), (240, 85, 60)]
+)
     return render(request, "leaderboard/table.html", {"leaderboard": sorted_leaderboard})
 
 def check_user_in_leaderboard(prediction, leaderboard):
@@ -167,3 +197,39 @@ def make_previous_friday(d):
 
 def order_leaderboard(leaderboard):
     return sorted(leaderboard, key=itemgetter("score", "perfect_predictions", "win_prediction_ratio"), reverse=True)
+
+def scale_color(value, vmin, vmax, colors):
+    """
+    value: number to color
+    vmin/vmax: range for scaling
+    colors: list of (hue, saturation, lightness) tuples for stops
+    """
+    try:
+        t = (float(value) - vmin) / (vmax - vmin) if vmax != vmin else 0
+    except (TypeError, ValueError):
+        t = 0
+    t = max(0, min(1, t))
+
+    if len(colors) == 2:
+        # Simple 2-color gradient
+        (h1, s1, l1), (h2, s2, l2) = colors
+        hue = h1 + t * (h2 - h1)
+        sat = s1 + t * (s2 - s1)
+        lig = l1 + t * (l2 - l1)
+        return f"hsl({hue:.0f}, {sat:.0f}%, {lig:.0f}%)"
+
+    elif len(colors) == 3:
+        # 3-color gradient — split at t=0.5
+        if t <= 0.5:
+            # interpolate between color 0 and 1
+            t2 = t / 0.5
+            (h1, s1, l1), (h2, s2, l2) = colors[0], colors[1]
+        else:
+            # interpolate between color 1 and 2
+            t2 = (t - 0.5) / 0.5
+            (h1, s1, l1), (h2, s2, l2) = colors[1], colors[2]
+
+        hue = h1 + t2 * (h2 - h1)
+        sat = s1 + t2 * (s2 - s1)
+        lig = l1 + t2 * (l2 - l1)
+        return f"hsl({hue:.0f}, {sat:.0f}%, {lig:.0f}%)"

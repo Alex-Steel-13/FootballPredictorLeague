@@ -77,13 +77,13 @@
             <td>{{ forloop.counter }}</td>
             <td>{{ entry.user }}</td>
             <td>{{ entry.number_of_predictions }}</td>
-            <td>{{ entry.points_this_week}} </td>
+            <td style="background-color: {{ entry.wb_color }};">{{ entry.points_this_week}} </td>
             <td>{{ entry.score }}</td>
             <td>{{ entry.average_points_per_game}}</td>
             <td>{{ entry.distance_to_first }}</td>
             <td>{{ entry.distance_to_placed_position }}</td>
             <td>{{ entry.distance_to_position_above }}</td>
-            <td>{{ entry.perfect_predictions }}</td>
+            <td style="background-color: {{ entry.cp_color }};">{{ entry.perfect_predictions }}</td>
             <td>{{ entry.win_prediction_ratio }}</td>
             <td>{{ entry.position_last_week }}</td>
             <td>{{ entry.postponed_games}}</td>
