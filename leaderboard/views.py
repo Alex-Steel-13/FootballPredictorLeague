@@ -199,20 +199,43 @@ def make_previous_friday(d):
 def order_leaderboard(leaderboard):
     return sorted(leaderboard, key=itemgetter("score", "perfect_predictions", "win_prediction_ratio"), reverse=True)
 
-def scale_color(value, vmin, vmax, start_hue, end_hue, fixed_hue=False):
+def scale_color(value, vmin, vmax, colors, fixed_hue=False):
+    """Map a value to a color using a 2-stop or 3-stop gradient."""
     try:
         t = (float(value) - vmin) / (vmax - vmin) if vmax != vmin else 0
     except (TypeError, ValueError):
         t = 0
-    t = max(0, min(1, t))
+    t = max(0, min(1, t))  # clamp between 0 and 1
 
     if fixed_hue:
-        # Keep hue fixed, vary lightness
-        hue = start_hue  # use start_hue as the fixed hue
-        sat = 85
-        lightness = 90 - (t * 50)  # 90% (light) → 40% (dark)
+        # Keep hue from first color in list, vary lightness only
+        hue, sat, light_start = colors[0]
+        _, _, light_end = colors[-1]
+        lightness = light_start + t * (light_end - light_start)
         return f"hsl({hue}, {sat}%, {lightness}%)"
+
+    if len(colors) == 2:
+        # Simple 2-color gradient
+        (h1, s1, l1), (h2, s2, l2) = colors
+        hue = h1 + t * (h2 - h1)
+        sat = s1 + t * (s2 - s1)
+        lig = l1 + t * (l2 - l1)
+        return f"hsl({hue:.0f}, {sat:.0f}%, {lig:.0f}%)"
+
+    elif len(colors) == 3:
+        # 3-color gradient, split halfway
+        if t <= 0.5:
+            t2 = t / 0.5
+            (h1, s1, l1), (h2, s2, l2) = colors[0], colors[1]
+        else:
+            t2 = (t - 0.5) / 0.5
+            (h1, s1, l1), (h2, s2, l2) = colors[1], colors[2]
+        hue = h1 + t2 * (h2 - h1)
+        sat = s1 + t2 * (s2 - s1)
+        lig = l1 + t2 * (l2 - l1)
+        return f"hsl({hue:.0f}, {sat:.0f}%, {lig:.0f}%)"
+
     else:
-        # Interpolate hue normally
-        hue = start_hue + t * (end_hue - start_hue)
-        return f"hsl({hue:.0f}, 85%, 60%)"
+        # Fallback: just return first color
+        h, s, l = colors[0]
+        return f"hsl({h}, {s}%, {l}%)"
