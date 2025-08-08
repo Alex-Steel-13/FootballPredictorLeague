@@ -110,9 +110,10 @@ def leaderboard(request):
             entry["perfect_predictions"],
             cor_min,
             cor_max,
-            [(0, 85, 60), (240, 85, 60)],
+            [(220, 85, 90), (220, 85, 40)],  # hue fixed at 220, lightness fades
             fixed_hue=True
-)
+        )
+
     return render(request, "leaderboard/table.html", {"leaderboard": sorted_leaderboard})
 
 def check_user_in_leaderboard(prediction, leaderboard):
