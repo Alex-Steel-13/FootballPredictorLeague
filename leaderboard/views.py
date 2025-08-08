@@ -40,7 +40,8 @@ def leaderboard(request):
         for entry in leaderboard:
             if prediction.user == entry["user"]:
                 #increases the number of predictions by 1
-                entry["number_of_predictions"] += 1
+                if not prediction.match.home_score:
+                    entry["number_of_predictions"] += 1
                 #increases score
                 prediction_points = evaluate_score(prediction)
                 entry["score"] += prediction_points
@@ -165,4 +166,4 @@ def make_previous_friday(d):
     return d - datetime.timedelta(days=days_to_subtract)
 
 def order_leaderboard(leaderboard):
-    return sorted(leaderboard, key=itemgetter("score", "win_prediction_ratio", "perfect_predictions"), reverse=True)
+    return sorted(leaderboard, key=itemgetter("score", "perfect_predictions", "win_prediction_ratio"), reverse=True)

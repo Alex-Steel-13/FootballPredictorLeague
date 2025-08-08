@@ -32,7 +32,7 @@ df.to_csv("predictions_backup.csv", index=False)
 subject = 'Automated Database CSV'
 body = 'Please find the attached database export for this week.'
 from_email = settings.EMAIL_HOST_USER
-to_email = ['michaelrsteel@gmail.com', 'alexandersteel12@gmail.com']
+to_email = [settings.EMAIL_DESTINATION_USER, settings.EMAIL_HOST_USER]
 
 email = EmailMessage(subject, body, from_email, to_email)
 
