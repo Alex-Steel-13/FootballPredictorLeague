@@ -120,7 +120,7 @@ urls = {
     "Scottish_League_2": "https://www.footballwebpages.co.uk/scottish-league-two/fixtures-results"
     }
 
-if datetime.datetime.now().day() == 1:
+if datetime.datetime.now().day() == 2:
     data = []
     for key,value in urls.items():
         result = scrape_data(value, key)
