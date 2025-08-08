@@ -24,7 +24,8 @@ def leaderboard(request):
             continue
         if not(check_user_in_leaderboard(prediction, leaderboard)):
             leaderboard.append({"user":prediction.user, 
-                                "number_of_predictions": 0, 
+                                "number_of_predictions": 0,
+                                "number_of_played_predictions": 0, 
                                 "postponed_games": 0, 
                                 "points_this_week": 0, 
                                 "score": 0, 
@@ -42,8 +43,9 @@ def leaderboard(request):
         for entry in leaderboard:
             if prediction.user == entry["user"]:
                 #increases the number of predictions by 1
+                entry["number_of_predictions"] += 1
                 if not (prediction.match.home_score is None):
-                    entry["number_of_predictions"] += 1
+                    entry["number_of_played_predictions"] += 1
                 #increases score
                 prediction_points = evaluate_score(prediction)
                 entry["score"] += prediction_points
@@ -90,8 +92,8 @@ def leaderboard(request):
             pts_min = entry["points_this_week"]
         if entry["perfect_predictions"] < cor_min:
             cor_min = entry["perfect_predictions"]
-        entry["average_points_per_game"] =  round(entry["score"] / entry["number_of_predictions"]) if entry["number_of_predictions"] else 0
-        entry["win_prediction_ratio"] = str(round(entry["correct_winner"] / entry["number_of_predictions"], 2)*100) + "%" if entry["number_of_predictions"] else 0
+        entry["average_points_per_game"] =  round(entry["score"] / entry["number_of_played_predictions"]) if entry["number_of_played_predictions"] else 0
+        entry["win_prediction_ratio"] = str(round(entry["correct_winner"] / entry["number_of_played_predictions"], 2)*100) + "%" if entry["number_of_played_predictions"] else 0
         entry["distance_to_first"] = sorted_leaderboard[0]["score"] - entry["score"]
         entry["distance_to_position_above"] = 0 if sorted_leaderboard.index(entry) == 0 else (sorted_leaderboard[sorted_leaderboard.index(entry) - 1]["score"] - entry["score"])
         entry["distance_to_placed_position"] = 0 if sorted_leaderboard.index(entry) <= 4 else (sorted_leaderboard[4]["score"] - entry["score"])    
