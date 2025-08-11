@@ -52,14 +52,20 @@
     {% for match_week, predictions in output.items %} 
         <h2>Match Week {{ match_week }}</h2>
         {% for prediction in predictions %}
-            {% if today_date >= prediction.match.match_date %}
+            {% if prediction.is_locked %}
                 <div class="prediction past-match">
-                <strong>{{ prediction.match.home_team }} vs {{ prediction.match.away_team }} on {{ prediction.match.match_date }}</strong>
-                <p>{{ prediction.predicted_home_score }} - {{ prediction.predicted_away_score }}</p>
+                    <strong>{{ prediction.match.home_team }} vs {{ prediction.match.away_team }} on {{ prediction.match.match_date }}</strong>
+                    <p>{{ prediction.predicted_home_score }} - {{ prediction.predicted_away_score }}</p>
+                </div>
             {% else %}
                 <div class="prediction">
-                <strong><a href="{% url 'predictions:edit_prediction' prediction.id %}">{{ prediction.match.home_team }} vs {{ prediction.match.away_team }} on {{ prediction.match.match_date }}</a></strong>
-                <p>{{ prediction.predicted_home_score }} - {{ prediction.predicted_away_score }}</p>
+                    <strong>
+                        <a href="{% url 'predictions:edit_prediction' prediction.id %}">
+                            {{ prediction.match.home_team }} vs {{ prediction.match.away_team }} on {{ prediction.match.match_date }}
+                        </a>
+                    </strong>
+                    <p>{{ prediction.predicted_home_score }} - {{ prediction.predicted_away_score }}</p>
+                </div>
             {% endif %}
         
             </div>

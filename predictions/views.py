@@ -117,20 +117,33 @@ def your_predictions(request):
     today = timezone.now().date()
     todays_game_week = get_match_week_start(today)
 
-    this_weeks_predictions = [] #actually this all the predictions that are in the current match week and onwards
+    # collect only current match week and onwards
+    this_weeks_predictions = []
     for prediction in predictions:
-        if get_match_week_start(prediction.match.match_date) >= todays_game_week:
+        mw_start = get_match_week_start(prediction.match.match_date)
+        if mw_start >= todays_game_week:
+            # --- lock everything in that match week from Saturday 00:00 ---
+            lock_date = mw_start + timedelta(days=1)     # Friday + 1 day = Saturday
+            prediction.is_locked = today >= lock_date    # boolean flag for template
             this_weeks_predictions.append(prediction)
-    this_weeks_predictions.sort(key = lambda prediction: prediction.match.match_date)
-    output = {todays_game_week : []}
+
+    # sort as before
+    this_weeks_predictions.sort(key=lambda p: p.match.match_date)
+
+    # build your output dict as before
+    output = {todays_game_week: []}
     for prediction in this_weeks_predictions:
-        if get_match_week_start(prediction.match.match_date) in output.keys():
-            output[get_match_week_start(prediction.match.match_date)].append(prediction)
+        mw_start = get_match_week_start(prediction.match.match_date)
+        if mw_start in output:
+            output[mw_start].append(prediction)
         else:
-            output[get_match_week_start(prediction.match.match_date)] = [prediction]
+            output[mw_start] = [prediction]
 
-
-    return render(request, "predictions/your_predictions.html", {"output" : output, "today_date" : today})
+    return render(
+        request,
+        "predictions/your_predictions.html",
+        {"output": output, "today_date": today}
+    )
 
 @login_required(login_url="/users/login/")
 def your_past_predictions(request):
