@@ -45,7 +45,10 @@ def upcoming_matches(request):
         if count <= 1:
             upcoming_matches_filtered_2.append(match)
 
-                
+    #to lock the predictions on saturday, will remove the rest of that matchweek
+    for match in upcoming_matches_filtered_2:
+        if today.weekday() == 0 or today.weekday() >= 5:
+            value = upcoming_matches_filtered_2.pop(get_match_week_start(today),None)             
 
     #goes through each match, works out the friday of the matchweek its in, adds it to the dict
     for match in upcoming_matches_filtered_2:
@@ -55,9 +58,7 @@ def upcoming_matches(request):
         else:
             match_dict[week_start] = [match]
     
-    #to lock the predictions on saturday, will remove the rest of that matchweek
-    if today.weekday() == 0 or today.weekday() >= 5:
-        value = match_dict.pop(get_match_week_start(today),None)
+    
     return render(request, 'predictions/upcoming_matches.html', {'matches': sorted(match_dict.items())})
 
 def get_match_week_start(d):
