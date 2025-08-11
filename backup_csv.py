@@ -1,4 +1,12 @@
+import os
+import django
 import pandas as pd
+
+BASE_DIR = "/myproject/FootballPredictorLeague/predictorleague"   # <-- change this
+os.chdir(BASE_DIR)
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "predictorleague.settings")  # <-- change this
+django.setup()
+
 from predictions.models import Prediction
 from datetime import datetime
 from django.core.mail import EmailMessage
