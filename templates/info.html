@@ -1,8 +1,84 @@
 {% extends "base.html" %}
-
-{% block title %}Info{% endblock %}
+{% load static %}
+{% block title %}CPL Rules & Instructions{% endblock %}
 
 {% block content %}
-<h1>Information</h1>
-<p>This is the information page for the Chiswick Predictor League.</p>
+<article class="cpl-rules" role="article">
+  <h1>Chiswick Predictor League – Rules and Instructions</h1>
+
+  <ol>
+    <li>Two predictions need to be submitted for each match week through to the end of the season.</li>
+
+    <li>Predictions are now going to be submitted through the new webapp. You must submit predictions before Friday 23:59 of the match week and Thursday 23:59 if choosing a Friday fixture. Once past these times the app will not let you choose a fixture.</li>
+
+    <li>The web app is at <a href="https://www.chiswickpredictorleague.co.uk/" rel="noopener">www.chiswickpredictorleague.co.uk</a>. Please register with your name as you want it to appear on the leaderboard. The Simons and Andys will need their surname initial too. Charlie, Mani and Tim need to put their winner stars in their usernames.</li>
+
+    <li>You will need to create a password. Please do not forget it as we are not sure we can reset it yet! You should probably add the app to your mobile home screen for easy access. It works best on landscape so twist your phones. Or you can use a PC.</li>
+
+    <li>The app will only give you the fixtures that you are allowed to pick from and will automatically remove fixtures if you have already had that team in the same month. This should make it impossible to make a mistake. You can edit and change your predictions, once made, up until Friday 23:59. Once you have made 2 predictions for the game week, all the fixtures will disappear – they reappear if you delete one of your predictions and need to pick another one. Fixtures will appear for the upcoming 2 month period so you can plan ahead.</li>
+
+    <li>A match week contains the games played from Friday evening through to the following Monday, allowing all teams to play their “weekend fixtures”. These will be the only fixtures that you see on the app. We will play from the first match week of the Premier League season until the last match week of the Premier League season (including weeks where there are no Premier League fixtures).</li>
+
+    <li>You can select fixtures from the 4 English leagues (Prem, Champ, L1, L2) and the 4 Scottish divisions (Prem, Champ, L1, L2) only — no non-league teams and you cannot select cup fixtures (they will not appear on the app). You also cannot predict play-off games at the end of the season.</li>
+
+    <li>You can only select a team once in any calendar month whether you are predicting them to win or lose or draw. At the beginning of the next calendar month all teams are fair game again. The app will not let you select a team that you have already had before in the month.</li>
+
+    <li>The month is determined by the date of the Friday in the match week – the app knows this and will present fixtures accordingly.</li>
+
+    <li>You can now predict home and away wins as before but you can also predict draws from this season.</li>
+
+    <li>
+      <p><strong>Scoring is as follows</strong> (any other permutation scores 0):</p>
+      <ul>
+        <li>You predict the winning team at home and the exact score correctly – <strong>100 points</strong>.</li>
+        <li>You predict the winning team away and the exact score correctly – <strong>125 points</strong>.</li>
+        <li>You predict a draw and the exact score correctly – <strong>125 points</strong>.</li>
+        <li>You predict a home win but the score is not exactly right – <strong>50 points</strong>.</li>
+        <li>You predict an away win but the score is not correct – <strong>75 points</strong>.</li>
+        <li>You predict a draw but the score is a different draw – <strong>75 points</strong>.</li>
+      </ul>
+    </li>
+
+    <li>This season we are playing a cup competition too so that more people (i.e. me) get the chance to experience success. The cup competition will not require different fixtures to be picked. Your regular picked games will go up against the regular picked games of another player. The highest score will go through. Ties will go to a replay the following week. The bottom 8 players on 31st Dec will play a qualifying round in the first January match week. The 4 winners will go into the first round against the top 12 players which will be played in the first match week of February. The quarter finals will be played in the first match week of March, the semi finals in the first match week of April and the final in the first match week of May.</li>
+
+    <li>
+      <p><strong>Prize money</strong> has been extended this season (so that I get some) as follows:</p>
+      <ul class="prizes">
+        <li>1st place — £350</li>
+        <li>2nd place — £175</li>
+        <li>3rd place — £100</li>
+        <li>4th place — £75</li>
+        <li>5th place — £50</li>
+        <li>Golden Boot (most correct predictions) — £100</li>
+        <li>Cup winner — £150</li>
+      </ul>
+    </li>
+
+    <li>I will still send reminder WhatsApp messages but if you forget to predict before the Friday 23:59 deadline then you <strong>CANNOT</strong> predict 4 fixtures the next week.</li>
+
+    <li>Everyone’s fixtures will be sent round on Saturday morning so we can enjoy each other’s successes! I will not look at the app until after I have chosen my fixtures (trust me!).</li>
+
+    <li>If your fixture is postponed you will need to wait until the re-arranged fixture is played but feel free to change it before the deadline for submitting fixtures if you spot it.</li>
+
+    <li>Entrance fee is £50 and there is now an admin fee of £3 to cover the webhosting costs.</li>
+
+    <li>Please transfer £53 to Michael Steel — SC 40-47-83 — Acc. No. 21480006.</li>
+
+    <li>There will be manager of the month awards for the best predictor each month, celebrated at the Annapurna quarterly – organised by the CPL Social Director Jeff. Attendance optional.</li>
+
+    <li>There is an end of season gala dinner – also at the Annapurna – for the full prize giving. Attendance mandatory (just about) – dress code black tie (not really).</li>
+  </ol>
+
+  <p><strong>Good luck!</strong></p>
+</article>
+
+<style>
+  .cpl-rules { max-width: 60rem; margin: 2rem auto; padding: 0 1rem; line-height: 1.6; }
+  .cpl-rules h1 { font-size: 1.875rem; margin-bottom: 1rem; }
+  .cpl-rules ol { padding-left: 1.25rem; }
+  .cpl-rules li { margin: 0.5rem 0; }
+  .cpl-rules ul { padding-left: 1.25rem; margin-top: 0.25rem; }
+  .cpl-rules .prizes li { list-style: "– "; padding-left: 0.35rem; }
+  .cpl-rules a { text-decoration: underline; }
+</style>
 {% endblock %}
