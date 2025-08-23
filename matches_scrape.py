@@ -72,7 +72,7 @@ def number_to_month(number):
 def scrape_data(url, league):
     month_int = datetime.datetime.now().month
     if month_int <= 10:
-        month = number_to_month(month_int + 2)
+        month = number_to_month(month_int + 1)
     elif month_int == 11:
         month = number_to_month(1)
     elif month_int == 12:
@@ -104,10 +104,21 @@ def scrape_data(url, league):
     result =[]
     for key, value in schedule.items():
         for home,away in value:
-            if home != None and away != None:
+            if home != None and away != None and is_weekend_or_monday(convert_datetime(key)):
                 result.append({"Date": convert_datetime(key), "Home" : home, "Away" : away, "League" : league})
 
     return result
+
+def is_weekend_or_monday(date):
+    """
+    Takes a date as input and returns True if the day is Friday/Saturday/Sunday/Monday,
+    False otherwise.
+    """
+    # Get the day of the week (0=Monday, 1=Tuesday, ..., 6=Sunday)
+    day_of_week = date.weekday()
+    
+    # Monday=0, Friday=4, Saturday=5, Sunday=6
+    return day_of_week in [0, 4, 5, 6]
 
 urls = {
     "Premier_League": "https://www.footballwebpages.co.uk/premier-league/fixtures-results",
