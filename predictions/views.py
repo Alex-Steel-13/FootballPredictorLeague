@@ -46,9 +46,12 @@ def upcoming_matches(request):
             upcoming_matches_filtered_2.append(match)
 
     #to lock the predictions on saturday, will remove the rest of that matchweek
-    for match in upcoming_matches_filtered_2:
-        if today.weekday() == 0 or today.weekday() >= 5:
-            value = upcoming_matches_filtered_2.pop(get_match_week_start(today),None)             
+    if today.weekday() in (5, 6, 0):  # Sat=5, Sun=6, Mon=0
+        locked_week_start = get_match_week_start(today)
+        upcoming_matches_filtered_2 = [
+            m for m in upcoming_matches_filtered_2
+            if get_match_week_start(m.match_date) != locked_week_start
+        ]            
 
     #goes through each match, works out the friday of the matchweek its in, adds it to the dict
     for match in upcoming_matches_filtered_2:
