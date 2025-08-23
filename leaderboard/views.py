@@ -39,7 +39,8 @@ def leaderboard(request):
                                 "distance_to_placed_position": 0,
                                 "points_from_previous_weeks":0,
                                 "wb_color": "hsl(0, 0, 0)",
-                                "cp_color": "hsl(0, 0, 0)"})
+                                "cp_color": "hsl(0, 0, 0)"},
+                                "non_string_ratio": 0)
         for entry in leaderboard:
             if prediction.user == entry["user"]:
                 #increases the number of predictions by 1
@@ -94,6 +95,7 @@ def leaderboard(request):
             cor_min = entry["perfect_predictions"]
         entry["average_points_per_game"] =  round(entry["score"] / entry["number_of_played_predictions"]) if entry["number_of_played_predictions"] else 0
         entry["win_prediction_ratio"] = str(round(entry["correct_winner"] / entry["number_of_played_predictions"], 2)*100) + "%" if entry["number_of_played_predictions"] else 0
+        entry["non_string_ratio"] = round(entry["correct_winner"] / entry["number_of_played_predictions"], 2)*100 if entry["number_of_played_predictions"] else 0
         entry["distance_to_first"] = sorted_leaderboard[0]["score"] - entry["score"]
         entry["distance_to_position_above"] = 0 if sorted_leaderboard.index(entry) == 0 else (sorted_leaderboard[sorted_leaderboard.index(entry) - 1]["score"] - entry["score"])
         entry["distance_to_placed_position"] = 0 if sorted_leaderboard.index(entry) <= 4 else (sorted_leaderboard[4]["score"] - entry["score"])    
@@ -200,7 +202,7 @@ def make_previous_friday(d):
     return d - datetime.timedelta(days=days_to_subtract)
 
 def order_leaderboard(leaderboard):
-    return sorted(leaderboard, key=itemgetter("score", "perfect_predictions", "win_prediction_ratio"), reverse=True)
+    return sorted(leaderboard, key=itemgetter("score", "perfect_predictions", "non_string_ratio"), reverse=True)
 
 def scale_color(value, vmin, vmax, colors, fixed_hue=False):
     """Map a value to a color using a 2-stop or 3-stop gradient."""
