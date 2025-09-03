@@ -99,14 +99,16 @@ def leaderboard(request):
 
         entry["win_prediction_ratio"] = str(round(entry["correct_winner"] / entry["number_of_played_predictions"], 2)*100) + "%" if entry["number_of_played_predictions"] else 0
 
-        entry["non_string_ratio"] = round(entry["correct_winner"] / entry["number_of_played_predictions"], 2)*100 if entry["number_of_played_predictions"] else 0
-
-        entry["distance_to_first"] = leaderboard[0]["score"] - entry["score"]
-
-        entry["distance_to_position_above"] = 0 if leaderboard.index(entry) == 0 else (leaderboard[leaderboard.index(entry) - 1]["score"] - entry["score"])
-        entry["distance_to_placed_position"] = 0 if leaderboard.index(entry) <= 4 else (leaderboard[4]["score"] - entry["score"])    
+        entry["non_string_ratio"] = round(entry["correct_winner"] / entry["number_of_played_predictions"], 2)*100 if entry["number_of_played_predictions"] else 0   
 
     sorted_leaderboard = order_leaderboard(leaderboard)
+    for entry in sorted_leaderboard:
+        
+        entry["distance_to_first"] = leaderboard[0]["score"] - entry["score"]
+
+        entry["distance_to_position_above"] = 0 if sorted_leaderboard.index(entry) == 0 else (sorted_leaderboard[sorted_leaderboard.index(entry) - 1]["score"] - entry["score"])
+        entry["distance_to_placed_position"] = 0 if sorted_leaderboard.index(entry) <= 4 else (sorted_leaderboard[4]["score"] - entry["score"]) 
+    
     #time to do colours
 
     for entry in sorted_leaderboard:
