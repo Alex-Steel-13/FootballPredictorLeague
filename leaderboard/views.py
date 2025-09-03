@@ -76,7 +76,7 @@ def leaderboard(request):
 
     
     #ordering
-    sorted_leaderboard = order_leaderboard(leaderboard)
+    
 
 
         
@@ -85,7 +85,7 @@ def leaderboard(request):
     pts_max = 0
     cor_min = 1000000000000
     cor_max = 0
-    for entry in sorted_leaderboard:
+    for entry in leaderboard:
         if entry["points_this_week"] > pts_max:
             pts_max = entry["points_this_week"]
         if entry["perfect_predictions"] > cor_max:
@@ -106,7 +106,7 @@ def leaderboard(request):
         entry["distance_to_position_above"] = 0 if sorted_leaderboard.index(entry) == 0 else (sorted_leaderboard[sorted_leaderboard.index(entry) - 1]["score"] - entry["score"])
         entry["distance_to_placed_position"] = 0 if sorted_leaderboard.index(entry) <= 4 else (sorted_leaderboard[4]["score"] - entry["score"])    
 
-
+    sorted_leaderboard = order_leaderboard(leaderboard)
     #time to do colours
 
     for entry in sorted_leaderboard:
