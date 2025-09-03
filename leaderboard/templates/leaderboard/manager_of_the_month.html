@@ -30,9 +30,9 @@
         {% endfor %}
       </tbody>
     </table>
-  {% else %}
+    {% if not table %}
     <p>No results yet — play some fixtures to populate the table!</p>
-  {% endif %}
+    {% endif %}
 </div>
 
 <style>
