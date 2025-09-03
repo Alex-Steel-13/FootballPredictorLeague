@@ -256,7 +256,7 @@ def manager_of_month(request):
     
     predictions = Prediction.objects.all()
     for prediction in predictions:
-        if prediction.match.match_date.month == (timezone.now().month-1):
+        if get_match_week_start(prediction.match.match_date).month == (get_match_week_start(timezone.now()).month-1):
             if not prediction.user.can_participate:
                 continue
             if not(check_user_in_leaderboard(prediction, table)):
@@ -266,7 +266,7 @@ def manager_of_month(request):
                             })
             for entry in table:
                 if entry["user"] == prediction.user:
-                    score += evaluate_score(prediction)
+                    entry["score"] += evaluate_score(prediction)
     
     ordered_table = sorted(table, key= lambda x: x["score"], reverse=True )
     return render(request, "leaderboard/manager_of_the_month.html", {"table": ordered_table})
