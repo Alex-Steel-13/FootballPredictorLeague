@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Manager of the Month{% endblock %}
+
+{% block content %}
+<div>
+  <header>
+    <h1>Manager of the Month</h1>
+    {% if month_label %}<p>{{ month_label }}</p>{% endif %}
+  </header>
+
+    <h2>Full Table</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Manager</th>
+          <th>Score</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in table %}
+          <tr>
+            <td>
+              {{ forloop.counter }}
+            </td>
+            <td>{{ item.user }}</td>
+            <td>{{ item.score }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No results yet — play some fixtures to populate the table!</p>
+  {% endif %}
+</div>
+
+<style>
+  table {
+            border-collapse: collapse;
+            width: 80%;
+            margin: auto;
+        }
+
+    th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+        }
+
+    th {
+            background-color: #f2f2f2;
+        }
+
+    h1 {
+            text-align: center;
+        }
+</style>
+{% endblock %}

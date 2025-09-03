@@ -208,7 +208,7 @@ def make_previous_friday(d):
     return d - datetime.timedelta(days=days_to_subtract)
 
 def order_leaderboard(leaderboard):
-    return sorted(leaderboard, key=itemgetter("score", "perfect_predictions", "non_string_ratio"), reverse=True)
+    return sorted(leaderboard, key=itemgetter("score", "non_string_ratio", "perfect_predictions"), reverse=True)
 
 def scale_color(value, vmin, vmax, colors, fixed_hue=False):
     """Map a value to a color using a 2-stop or 3-stop gradient."""

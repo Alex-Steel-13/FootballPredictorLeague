@@ -68,6 +68,7 @@
         <div class="nav-container">
             <ul class="nav-left">
                 <li><a href="{% url 'leaderboard:leaderboard' %}">Home</a></li>
+                <li><a href="{% url 'leaderboard:manager_of_the_month' %}">Manager of the Month</a></li>
                 {% if user.is_authenticated %}
                     <li><a href="{% url 'predictions:upcoming_matches' %}">Choose Predictions</a></li>
                     <li><a href="{% url 'predictions:your_predictions' %}">Edit Your Predictions</a></li>
