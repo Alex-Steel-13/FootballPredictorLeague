@@ -1,0 +1,225 @@
+Date,Home,Away,League
+2025-10-03,AFC Bournemouth,Fulham,Premier_League
+2025-10-04,Arsenal,West Ham United,Premier_League
+2025-10-04,Chelsea,Liverpool,Premier_League
+2025-10-04,Leeds United,Tottenham Hotspur,Premier_League
+2025-10-04,Manchester United,Sunderland,Premier_League
+2025-10-05,Aston Villa,Burnley,Premier_League
+2025-10-05,Brentford,Manchester City,Premier_League
+2025-10-05,Everton,Crystal Palace,Premier_League
+2025-10-05,Newcastle United,Nottingham Forest,Premier_League
+2025-10-05,Wolverhampton Wanderers,Brighton & Hove Albion,Premier_League
+2025-10-18,Brighton & Hove Albion,Newcastle United,Premier_League
+2025-10-18,Burnley,Leeds United,Premier_League
+2025-10-18,Crystal Palace,AFC Bournemouth,Premier_League
+2025-10-18,Fulham,Arsenal,Premier_League
+2025-10-18,Manchester City,Everton,Premier_League
+2025-10-18,Nottingham Forest,Chelsea,Premier_League
+2025-10-18,Sunderland,Wolverhampton Wanderers,Premier_League
+2025-10-19,Liverpool,Manchester United,Premier_League
+2025-10-19,Tottenham Hotspur,Aston Villa,Premier_League
+2025-10-20,West Ham United,Brentford,Premier_League
+2025-10-24,Leeds United,West Ham United,Premier_League
+2025-10-25,Brentford,Liverpool,Premier_League
+2025-10-25,Chelsea,Sunderland,Premier_League
+2025-10-25,Manchester United,Brighton & Hove Albion,Premier_League
+2025-10-25,Newcastle United,Fulham,Premier_League
+2025-10-26,AFC Bournemouth,Nottingham Forest,Premier_League
+2025-10-26,Arsenal,Crystal Palace,Premier_League
+2025-10-26,Aston Villa,Manchester City,Premier_League
+2025-10-26,Everton,Tottenham Hotspur,Premier_League
+2025-10-26,Wolverhampton Wanderers,Burnley,Premier_League
+2025-10-03,Wrexham,Birmingham City,Championship
+2025-10-04,Blackburn Rovers,Stoke City,Championship
+2025-10-04,Bristol City,Queens Park Rangers,Championship
+2025-10-04,Derby County,Southampton,Championship
+2025-10-04,Hull City,Sheffield United,Championship
+2025-10-04,Millwall,West Bromwich Albion,Championship
+2025-10-04,Portsmouth,Middlesbrough,Championship
+2025-10-04,Preston North End,Charlton Athletic,Championship
+2025-10-04,Sheffield Wednesday,Coventry City,Championship
+2025-10-04,Swansea City,Leicester City,Championship
+2025-10-04,Watford,Oxford United,Championship
+2025-10-05,Ipswich Town,Norwich City,Championship
+2025-10-17,Middlesbrough,Ipswich Town,Championship
+2025-10-18,Birmingham City,Hull City,Championship
+2025-10-18,Charlton Athletic,Sheffield Wednesday,Championship
+2025-10-18,Coventry City,Blackburn Rovers,Championship
+2025-10-18,Leicester City,Portsmouth,Championship
+2025-10-18,Norwich City,Bristol City,Championship
+2025-10-18,Oxford United,Derby County,Championship
+2025-10-18,Queens Park Rangers,Millwall,Championship
+2025-10-18,Sheffield United,Watford,Championship
+2025-10-18,Southampton,Swansea City,Championship
+2025-10-18,Stoke City,Wrexham,Championship
+2025-10-18,West Bromwich Albion,Preston North End,Championship
+2025-10-24,Preston North End,Sheffield United,Championship
+2025-10-25,Blackburn Rovers,Southampton,Championship
+2025-10-25,Bristol City,Birmingham City,Championship
+2025-10-25,Coventry City,Watford,Championship
+2025-10-25,Derby County,Queens Park Rangers,Championship
+2025-10-25,Hull City,Charlton Athletic,Championship
+2025-10-25,Ipswich Town,West Bromwich Albion,Championship
+2025-10-25,Middlesbrough,Wrexham,Championship
+2025-10-25,Millwall,Leicester City,Championship
+2025-10-25,Portsmouth,Stoke City,Championship
+2025-10-25,Sheffield Wednesday,Oxford United,Championship
+2025-10-25,Swansea City,Norwich City,Championship
+2025-10-31,Wrexham,Coventry City,Championship
+2025-10-04,Blackpool,AFC Wimbledon,League_1
+2025-10-04,Bolton Wanderers,Peterborough United,League_1
+2025-10-04,Cardiff City,Leyton Orient,League_1
+2025-10-04,Doncaster Rovers,Burton Albion,League_1
+2025-10-04,Huddersfield Town,Stockport County,League_1
+2025-10-04,Lincoln City,Exeter City,League_1
+2025-10-04,Plymouth Argyle,Wigan Athletic,League_1
+2025-10-04,Port Vale,Northampton Town,League_1
+2025-10-04,Reading,Mansfield Town,League_1
+2025-10-04,Stevenage,Luton Town,League_1
+2025-10-04,Wycombe Wanderers,Barnsley,League_1
+2025-10-11,AFC Wimbledon,Port Vale,League_1
+2025-10-11,Barnsley,Cardiff City,League_1
+2025-10-11,Bradford City,Lincoln City,League_1
+2025-10-11,Burton Albion,Bolton Wanderers,League_1
+2025-10-11,Exeter City,Reading,League_1
+2025-10-11,Leyton Orient,Doncaster Rovers,League_1
+2025-10-11,Luton Town,Huddersfield Town,League_1
+2025-10-11,Mansfield Town,Plymouth Argyle,League_1
+2025-10-11,Northampton Town,Rotherham United,League_1
+2025-10-11,Peterborough United,Stevenage,League_1
+2025-10-11,Stockport County,Blackpool,League_1
+2025-10-11,Wigan Athletic,Wycombe Wanderers,League_1
+2025-10-18,Blackpool,Wycombe Wanderers,League_1
+2025-10-18,Bradford City,Barnsley,League_1
+2025-10-18,Burton Albion,Peterborough United,League_1
+2025-10-18,Cardiff City,Reading,League_1
+2025-10-18,Doncaster Rovers,Northampton Town,League_1
+2025-10-18,Lincoln City,Stevenage,League_1
+2025-10-18,Luton Town,Mansfield Town,League_1
+2025-10-18,Plymouth Argyle,AFC Wimbledon,League_1
+2025-10-18,Rotherham United,Leyton Orient,League_1
+2025-10-18,Stockport County,Exeter City,League_1
+2025-10-18,Wigan Athletic,Port Vale,League_1
+2025-10-25,AFC Wimbledon,Burton Albion,League_1
+2025-10-25,Barnsley,Rotherham United,League_1
+2025-10-25,Bolton Wanderers,Cardiff City,League_1
+2025-10-25,Leyton Orient,Lincoln City,League_1
+2025-10-25,Mansfield Town,Wigan Athletic,League_1
+2025-10-25,Northampton Town,Luton Town,League_1
+2025-10-25,Peterborough United,Blackpool,League_1
+2025-10-25,Reading,Doncaster Rovers,League_1
+2025-10-25,Stevenage,Bradford City,League_1
+2025-10-25,Wycombe Wanderers,Huddersfield Town,League_1
+2025-10-27,Port Vale,Stockport County,League_1
+2025-10-04,Barnet,Accrington Stanley,League_2
+2025-10-04,Barrow,Shrewsbury Town,League_2
+2025-10-04,Bromley,Tranmere Rovers,League_2
+2025-10-04,Cambridge United,Crawley Town,League_2
+2025-10-04,Cheltenham Town,Fleetwood Town,League_2
+2025-10-04,Colchester United,Chesterfield,League_2
+2025-10-04,Milton Keynes Dons,Gillingham,League_2
+2025-10-04,Newport County,Swindon Town,League_2
+2025-10-04,Notts County,Oldham Athletic,League_2
+2025-10-04,Salford City,Grimsby Town,League_2
+2025-10-04,Walsall,Bristol Rovers,League_2
+2025-10-06,Harrogate Town,Crewe Alexandra,League_2
+2025-10-11,Accrington Stanley,Newport County,League_2
+2025-10-11,Bristol Rovers,Milton Keynes Dons,League_2
+2025-10-11,Chesterfield,Salford City,League_2
+2025-10-11,Crawley Town,Walsall,League_2
+2025-10-11,Crewe Alexandra,Bromley,League_2
+2025-10-11,Fleetwood Town,Harrogate Town,League_2
+2025-10-11,Gillingham,Cheltenham Town,League_2
+2025-10-11,Grimsby Town,Colchester United,League_2
+2025-10-11,Oldham Athletic,Barrow,League_2
+2025-10-11,Shrewsbury Town,Cambridge United,League_2
+2025-10-11,Swindon Town,Notts County,League_2
+2025-10-11,Tranmere Rovers,Barnet,League_2
+2025-10-18,Accrington Stanley,Swindon Town,League_2
+2025-10-18,Barnet,Notts County,League_2
+2025-10-18,Bristol Rovers,Tranmere Rovers,League_2
+2025-10-18,Cambridge United,Bromley,League_2
+2025-10-18,Chesterfield,Fleetwood Town,League_2
+2025-10-18,Colchester United,Harrogate Town,League_2
+2025-10-18,Grimsby Town,Gillingham,League_2
+2025-10-18,Milton Keynes Dons,Crewe Alexandra,League_2
+2025-10-18,Newport County,Cheltenham Town,League_2
+2025-10-18,Salford City,Oldham Athletic,League_2
+2025-10-18,Shrewsbury Town,Crawley Town,League_2
+2025-10-18,Walsall,Barrow,League_2
+2025-10-25,Barrow,Barnet,League_2
+2025-10-25,Bromley,Milton Keynes Dons,League_2
+2025-10-25,Cheltenham Town,Walsall,League_2
+2025-10-25,Crawley Town,Bristol Rovers,League_2
+2025-10-25,Crewe Alexandra,Grimsby Town,League_2
+2025-10-25,Fleetwood Town,Accrington Stanley,League_2
+2025-10-25,Gillingham,Salford City,League_2
+2025-10-25,Harrogate Town,Newport County,League_2
+2025-10-25,Notts County,Cambridge United,League_2
+2025-10-25,Oldham Athletic,Shrewsbury Town,League_2
+2025-10-25,Swindon Town,Colchester United,League_2
+2025-10-25,Tranmere Rovers,Chesterfield,League_2
+2025-10-04,Dundee United,Livingston,Scottish_Premier_League
+2025-10-04,Heart of Midlothian,Hibernian,Scottish_Premier_League
+2025-10-04,Kilmarnock,St Mirren,Scottish_Premier_League
+2025-10-05,Aberdeen,Dundee,Scottish_Premier_League
+2025-10-05,Celtic,Motherwell,Scottish_Premier_League
+2025-10-05,Falkirk,Rangers,Scottish_Premier_League
+2025-10-18,Hibernian,Livingston,Scottish_Premier_League
+2025-10-18,Kilmarnock,Heart of Midlothian,Scottish_Premier_League
+2025-10-18,Motherwell,Falkirk,Scottish_Premier_League
+2025-10-18,Rangers,Dundee United,Scottish_Premier_League
+2025-10-18,St Mirren,Aberdeen,Scottish_Premier_League
+2025-10-19,Dundee,Celtic,Scottish_Premier_League
+2025-10-25,Dundee United,St Mirren,Scottish_Premier_League
+2025-10-25,Falkirk,Dundee,Scottish_Premier_League
+2025-10-25,Livingston,Motherwell,Scottish_Premier_League
+2025-10-25,Rangers,Kilmarnock,Scottish_Premier_League
+2025-10-26,Aberdeen,Hibernian,Scottish_Premier_League
+2025-10-26,Heart of Midlothian,Celtic,Scottish_Premier_League
+2025-10-26,Rangers,Kilmarnock,Scottish_Premier_League
+2025-10-04,Airdrieonians,Greenock Morton,Scottish_Championship
+2025-10-04,Dunfermline Athletic,Queens Park,Scottish_Championship
+2025-10-04,Partick Thistle,Arbroath,Scottish_Championship
+2025-10-04,Ross County,Raith Rovers,Scottish_Championship
+2025-10-04,St Johnstone,Ayr United,Scottish_Championship
+2025-10-11,Airdrieonians,Dunfermline Athletic,Scottish_Championship
+2025-10-11,Arbroath,Queens Park,Scottish_Championship
+2025-10-11,Greenock Morton,Partick Thistle,Scottish_Championship
+2025-10-11,Raith Rovers,Ayr United,Scottish_Championship
+2025-10-11,St Johnstone,Ross County,Scottish_Championship
+2025-10-17,Dunfermline Athletic,Raith Rovers,Scottish_Championship
+2025-10-18,Arbroath,St Johnstone,Scottish_Championship
+2025-10-18,Ayr United,Greenock Morton,Scottish_Championship
+2025-10-18,Partick Thistle,Ross County,Scottish_Championship
+2025-10-18,Queens Park,Airdrieonians,Scottish_Championship
+2025-10-25,Airdrieonians,Arbroath,Scottish_Championship
+2025-10-25,Greenock Morton,St Johnstone,Scottish_Championship
+2025-10-25,Queens Park,Ayr United,Scottish_Championship
+2025-10-25,Raith Rovers,Partick Thistle,Scottish_Championship
+2025-10-25,Ross County,Dunfermline Athletic,Scottish_Championship
+2025-10-04,East Fife,Cove Rangers,Scottish_League_1
+2025-10-04,Hamilton Academical,Inverness Caledonian Thistle,Scottish_League_1
+2025-10-04,Kelty Hearts,Peterhead,Scottish_League_1
+2025-10-04,Queen of the South,Alloa Athletic,Scottish_League_1
+2025-10-04,Stenhousemuir,Montrose,Scottish_League_1
+2025-10-18,Alloa Athletic,East Fife,Scottish_League_1
+2025-10-18,Cove Rangers,Stenhousemuir,Scottish_League_1
+2025-10-18,Inverness Caledonian Thistle,Kelty Hearts,Scottish_League_1
+2025-10-18,Montrose,Hamilton Academical,Scottish_League_1
+2025-10-18,Peterhead,Queen of the South,Scottish_League_1
+2025-10-25,Alloa Athletic,Stenhousemuir,Scottish_League_1
+2025-10-25,Hamilton Academical,Queen of the South,Scottish_League_1
+2025-10-25,Kelty Hearts,East Fife,Scottish_League_1
+2025-10-25,Montrose,Cove Rangers,Scottish_League_1
+2025-10-25,Peterhead,Inverness Caledonian Thistle,Scottish_League_1
+2025-10-04,Clyde,East Kilbride,Scottish_League_2
+2025-10-04,Elgin City,Forfar Athletic,Scottish_League_2
+2025-10-04,Spartans,Edinburgh City,Scottish_League_2
+2025-10-04,Stirling Albion,Dumbarton,Scottish_League_2
+2025-10-04,Stranraer,Annan Athletic,Scottish_League_2
+2025-10-18,Annan Athletic,Stirling Albion,Scottish_League_2
+2025-10-18,Dumbarton,Spartans,Scottish_League_2
+2025-10-18,East Kilbride,Elgin City,Scottish_League_2
+2025-10-18,Edinburgh City,Stranraer,Scottish_League_2
+2025-10-18,Forfar Athletic,Clyde,Scottish_League_2
