@@ -121,8 +121,7 @@ def create_leaderboard(predictions=Prediction.objects.all()):
             [(220, 85, 90), (220, 85, 40)],  # hue fixed at 220, lightness fades
             fixed_hue=True
         )
-    start_of_current_week = get_match_week_start(today)
-    predictions_without_this_week = Prediction.objects.filter(match__match_date__lt=start_of_current_week)
+    predictions_without_this_week = Prediction.objects.filter(match__match_date__lt=get_match_week_start(today))
     last_week_leaderboard = create_leaderboard(predictions_without_this_week)
     for entry in last_week_leaderboard:
         for x in sorted_leaderboard:
