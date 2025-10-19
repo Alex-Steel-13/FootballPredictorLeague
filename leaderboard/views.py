@@ -69,12 +69,6 @@ def create_leaderboard(predictions=Prediction.objects.all(), last_week=False):
                 if get_match_week_start(prediction.match.match_date) <= get_match_week_start((today) - timedelta(days=7)).date():
                     entry["points_from_previous_weeks"] += prediction_points
                 
-
-    
-    #ordering
-    
-
-
         
     #new loop for stats that don't need a prediction
     pts_min = 1000000000000
@@ -122,8 +116,9 @@ def create_leaderboard(predictions=Prediction.objects.all(), last_week=False):
             fixed_hue=True
         )
     predictions_without_this_week = Prediction.objects.filter(match__match_date__lt=get_match_week_start(today))
-    last_week_leaderboard = create_leaderboard(predictions_without_this_week, last_week=True)
+    
     if not(last_week):
+        last_week_leaderboard = create_leaderboard(predictions_without_this_week, last_week=True)
         for entry in last_week_leaderboard:
             for x in sorted_leaderboard:
                 if entry["user"] == x["user"]:
