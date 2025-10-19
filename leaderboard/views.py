@@ -10,7 +10,7 @@ from operator import itemgetter
 
 # Create your views here.
 
-def create_leaderboard(predictions=Prediction.objects.all()):
+def create_leaderboard(predictions=Prediction.objects.all(), last_week=False):
     today = timezone.now()
     leaderboard = []
 
@@ -122,11 +122,12 @@ def create_leaderboard(predictions=Prediction.objects.all()):
             fixed_hue=True
         )
     predictions_without_this_week = Prediction.objects.filter(match__match_date__lt=get_match_week_start(today))
-    last_week_leaderboard = create_leaderboard(predictions_without_this_week)
-    for entry in last_week_leaderboard:
-        for x in sorted_leaderboard:
-            if entry["user"] == x["user"]:
-                x["position_last_week"] = last_week_leaderboard.index(entry) + 1
+    last_week_leaderboard = create_leaderboard(predictions_without_this_week, last_week=True)
+    if not(last_week):
+        for entry in last_week_leaderboard:
+            for x in sorted_leaderboard:
+                if entry["user"] == x["user"]:
+                    x["position_last_week"] = last_week_leaderboard.index(entry) + 1
     return sorted_leaderboard
 
 def leaderboard(request):
