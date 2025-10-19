@@ -97,7 +97,7 @@ def leaderboard(request):
 
         entry["average_points_per_game"] =  round(entry["score"] / entry["number_of_played_predictions"]) if entry["number_of_played_predictions"] else 0
 
-        entry["win_prediction_ratio"] = str(round(entry["correct_winner"] / entry["number_of_played_predictions"], 2)*100) + "%" if entry["number_of_played_predictions"] else 0
+        entry["win_prediction_ratio"] = str(round((entry["correct_winner"] / entry["number_of_played_predictions"]*100))) + "%" if entry["number_of_played_predictions"] else 0
 
         entry["non_string_ratio"] = round(entry["correct_winner"] / entry["number_of_played_predictions"], 2)*100 if entry["number_of_played_predictions"] else 0   
 
