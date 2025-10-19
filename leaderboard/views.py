@@ -10,13 +10,9 @@ from operator import itemgetter
 
 # Create your views here.
 
-def leaderboard(request):
+def create_leaderboard(predictions=Prediction.objects.all()):
     today = timezone.now()
     leaderboard = []
-
-    predictions = Prediction.objects.all()
-
-
 
     for prediction in predictions:
         #Adds the user into the leaderboard
@@ -97,14 +93,14 @@ def leaderboard(request):
 
         entry["average_points_per_game"] =  round(entry["score"] / entry["number_of_played_predictions"]) if entry["number_of_played_predictions"] else 0
 
-        entry["win_prediction_ratio"] = str(round((entry["correct_winner"] / entry["number_of_played_predictions"]*100))) + "%" if entry["number_of_played_predictions"] else 0
+        entry["win_prediction_ratio"] = str(round((entry["correct_winner"] / entry["number_of_played_predictions"]*100), 1)) + "%" if entry["number_of_played_predictions"] else 0
 
         entry["non_string_ratio"] = round(entry["correct_winner"] / entry["number_of_played_predictions"], 2)*100 if entry["number_of_played_predictions"] else 0   
 
     sorted_leaderboard = order_leaderboard(leaderboard)
     for entry in sorted_leaderboard:
         
-        entry["distance_to_first"] = leaderboard[0]["score"] - entry["score"]
+        entry["distance_to_first"] = sorted_leaderboard[0]["score"] - entry["score"]
 
         entry["distance_to_position_above"] = 0 if sorted_leaderboard.index(entry) == 0 else (sorted_leaderboard[sorted_leaderboard.index(entry) - 1]["score"] - entry["score"])
         entry["distance_to_placed_position"] = 0 if sorted_leaderboard.index(entry) <= 4 else (sorted_leaderboard[4]["score"] - entry["score"]) 
@@ -125,7 +121,16 @@ def leaderboard(request):
             [(220, 85, 90), (220, 85, 40)],  # hue fixed at 220, lightness fades
             fixed_hue=True
         )
+    predictions_without_this_week = filter(lambda x : get_match_week_start(x.match.match_date) < get_match_week_start(today), Prediction.objects.all())
+    last_week_leaderboard = create_leaderboard(predictions_without_this_week)
+    for entry in last_week_leaderboard:
+        for x in sorted_leaderboard:
+            if entry["user"] == x["user"]:
+                x["position_last_week"] = last_week_leaderboard.index(entry) + 1
+    return sorted_leaderboard
 
+def leaderboard(request):
+    sorted_leaderboard = create_leaderboard()
     return render(request, "leaderboard/table.html", {"leaderboard": sorted_leaderboard})
 
 def check_user_in_leaderboard(prediction, leaderboard):
