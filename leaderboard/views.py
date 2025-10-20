@@ -7,6 +7,7 @@ from datetime import timedelta
 import datetime
 from django.utils import timezone
 from operator import itemgetter
+from django.contrib.auth.models import User
 
 
 # Create your views here.
