@@ -281,3 +281,12 @@ def manager_of_month(request):
     
     ordered_table = sorted(table, key= lambda x: x["score"], reverse=True )
     return render(request, "leaderboard/manager_of_the_month.html", {"table": ordered_table})
+
+def profile(request, username):
+    today = timezone.now()
+    predictions = Prediction.objects.filter(user__username=username).order_by("-match__match_date")
+    predictions_final = []
+    for prediction in predictions:
+        if not(get_match_week_start(prediction.match.match_date) == get_match_week_start(today)):
+            predictions_final.append(prediction)
+    return render(request, "leaderboard/profile.html", predictions_final)

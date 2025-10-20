@@ -1,0 +1,112 @@
+
+
+{% block title %}Predictions by {{ profile_user.username }}{% endblock %}
+
+{% block content %}
+<style>
+    /* Basic styling for the content area */
+    .content-container {
+        font-family: Arial, sans-serif;
+        background-color: white;
+        padding: 20px;
+        border-radius: 8px;
+        max-width: 900px;
+        margin: 20px auto;
+    }
+
+    h1 {
+        color: #333;
+        border-bottom: 2px solid #ccc;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+    }
+
+    /* Table styling */
+    .predictions-table {
+        width: 100%;
+        border-collapse: collapse; /* Removes space between borders */
+        margin-top: 20px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .predictions-table thead {
+        background-color: #007bff;
+        color: white;
+    }
+
+    .predictions-table th, .predictions-table td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    /* Style for table headers */
+    .predictions-table th {
+        font-weight: bold;
+    }
+
+    /* Alternating row colors for readability */
+    .predictions-table tbody tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+
+    /* Hover effect for rows */
+    .predictions-table tbody tr:hover {
+        background-color: #e9ecef;
+    }
+
+    /* Centering the predicted score */
+    .prediction-score {
+        text-align: center;
+        font-weight: bold;
+        font-size: 1.1em;
+    }
+
+    /* Message for when there are no predictions */
+    .no-predictions {
+        margin-top: 20px;
+        padding: 15px;
+        background-color: #f2f2f2;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        color: #555;
+        text-align: center;
+    }
+</style>
+
+<div class="content-container">
+    <h1>All Predictions by {{ profile_user.username }}</h1>
+
+    <table class="predictions-table">
+        <thead>
+            <tr>
+                <th>Match</th>
+                <th>Match Date</th>
+                <th>Prediction</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for prediction in predictions %}
+                <tr>
+                    <td>
+                        {{ prediction.match.home_team.name }} vs {{ prediction.match.away_team.name }}
+                    </td>
+                    <td>
+                        {{ prediction.match.match_date|date:"D d M Y" }}
+                    </td>
+                    <td class="prediction-score">
+                        {{ prediction.predicted_home_score }} - {{ prediction.predicted_away_score }}
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="3">
+                        <p class="no-predictions">{{ profile_user.username }} has not made any predictions yet.</p>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
