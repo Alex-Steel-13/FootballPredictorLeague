@@ -296,4 +296,4 @@ def profile(request, username):
         'profile_user': profile_user,
         'predictions': predictions_final,
     }
-    return render(request, "leaderboard/profile.html", {predictions_final})
+    return render(request, "leaderboard/profile.html", context)
