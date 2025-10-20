@@ -183,8 +183,16 @@ def predictions(request):
     predictions_this_week = []
     for prediction in predictions:
         if match_week == get_match_week_start(prediction.match.match_date):
-            predictions_this_week.append(prediction)
-    predictions_this_week.sort(key= lambda x: x.user.username.lower())
+            predictions_this_week.append({"prediction":prediction})
+    leaderboard = create_leaderboard()
+    user_rankings = {}
+    count = 1
+    for entry in leaderboard:
+        user_rankings[entry["user"].id] = count
+        count += 1
+    for prediction in predictions_this_week:
+        prediction["rank"] = user_rankings[prediction["prediction"].user.id]
+    predictions_this_week.sort(key=lambda item: item["rank"])
 
     return render(request, "leaderboard/predictions.html", {"predictions": predictions_this_week})
 
