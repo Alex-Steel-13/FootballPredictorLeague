@@ -49,6 +49,12 @@
             background-color: #4B3621;
             color: white;
         }
+        .green {
+            background-color: #00ff00;
+        }
+        .red {
+            background-color: #ff0400;
+        }
 
     </style>
 </head>
@@ -85,7 +91,7 @@
             <td>{{ entry.distance_to_position_above }}</td>
             <td style="background-color: {{ entry.cp_color }};">{{ entry.perfect_predictions }}</td>
             <td>{{ entry.win_prediction_ratio }}</td>
-            <td>{{ entry.position_last_week }}</td>
+            <td class="{% if forloop.counter > entry.position_last_week %}green{% elif forloop.counter < entry.position_last_week %}red{% endif %}">{{ entry.position_last_week }}</td>
             <td>{{ entry.postponed_games}}</td>
         </tr>
         {% empty %}
