@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from . import Evaluate_Scores
 from .models import LeaderboardEntry
 from predictions.models import Prediction
@@ -284,9 +285,14 @@ def manager_of_month(request):
 
 def profile(request, username):
     today = timezone.now()
+    profile_user = get_object_or_404(User, username=username)
     predictions = Prediction.objects.filter(user__username=username).order_by("-match__match_date")
     predictions_final = []
     for prediction in predictions:
         if not(get_match_week_start(prediction.match.match_date) == get_match_week_start(today)):
             predictions_final.append(prediction)
-    return render(request, "leaderboard/profile.html", predictions_final)
+    context = {
+        'profile_user': profile_user,
+        'predictions': predictions_final,
+    }
+    return render(request, "leaderboard/profile.html", {predictions_final})
