@@ -12,9 +12,8 @@ from django.contrib.auth.models import User
 
 # Create your views here.
 
-def create_leaderboard(predictions=Prediction.objects.all(), last_week=False):
+def create_leaderboard(leaderboard, predictions=Prediction.objects.all(), last_week=False):
     today = timezone.now()
-    leaderboard = []
 
     for prediction in predictions:
         #Adds the user into the leaderboard
@@ -120,7 +119,8 @@ def create_leaderboard(predictions=Prediction.objects.all(), last_week=False):
     predictions_without_this_week = Prediction.objects.filter(match__match_date__lt=get_match_week_start(today))
     
     if not(last_week):
-        last_week_leaderboard = create_leaderboard(predictions_without_this_week, last_week=True)
+        last_week_leaderboard = []
+        last_week_leaderboard = create_leaderboard(last_week_leaderboard,predictions_without_this_week, last_week=True)
         for entry in last_week_leaderboard:
             for x in sorted_leaderboard:
                 if entry["user"] == x["user"]:
@@ -128,7 +128,7 @@ def create_leaderboard(predictions=Prediction.objects.all(), last_week=False):
     return sorted_leaderboard
 
 def leaderboard(request):
-    sorted_leaderboard = create_leaderboard()
+    sorted_leaderboard = create_leaderboard([])
     return render(request, "leaderboard/table.html", {"leaderboard": sorted_leaderboard})
 
 def check_user_in_leaderboard(prediction, leaderboard):
