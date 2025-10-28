@@ -54,7 +54,7 @@ def month_to_number(month):
 def number_to_month(number):
     months = [
         "january", "february", "march", "april", "may", "june",
-        "july", "august", "september", "october", "nvember", "december"
+        "july", "august", "september", "october", "november", "december"
     ]
     if 1 <= number <= 12:
         return months[number -1]
@@ -64,7 +64,7 @@ def number_to_month(number):
 def scrape_data(url, league):
     month_int = datetime.datetime.now().month
     if month_int <= 10:
-        month = number_to_month(month_int)
+        month = number_to_month(month_int+1)
     elif month_int == 11:
         month = number_to_month(1)
     elif month_int == 12:
@@ -135,5 +135,5 @@ for key,value in urls.items():
 
 df = pd.DataFrame(data)
 
-os.makedirs('predictorleague/scraped_matches', exist_ok=True)
-df.to_csv('predictorleague/scraped_matches/matches.csv', index=False)
+os.makedirs('scraped_matches', exist_ok=True)
+df.to_csv('scraped_matches/matches_nov.csv', index=False)
