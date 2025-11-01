@@ -186,7 +186,7 @@ def predictions(request):
     for prediction in predictions:
         if match_week == get_match_week_start(prediction.match.match_date):
             predictions_this_week.append({"prediction":prediction})
-    leaderboard = create_leaderboard()
+    leaderboard = create_leaderboard([])
     user_rankings = {}
     count = 1
     for entry in leaderboard:
