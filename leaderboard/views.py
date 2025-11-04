@@ -116,15 +116,7 @@ def create_leaderboard(leaderboard, predictions=Prediction.objects.all(), last_w
             [(220, 85, 90), (220, 85, 40)],  # hue fixed at 220, lightness fades
             fixed_hue=True
         )
-    predictions_without_this_week = Prediction.objects.filter(match__match_date__lt=get_match_week_start(today))
     
-    if not(last_week):
-        last_week_leaderboard = []
-        last_week_leaderboard = create_leaderboard(last_week_leaderboard,predictions_without_this_week, last_week=True)
-        for entry in last_week_leaderboard:
-            for x in sorted_leaderboard:
-                if entry["user"] == x["user"]:
-                    x["position_last_week"] = last_week_leaderboard.index(entry) + 1
     return sorted_leaderboard
 
 def leaderboard(request):
