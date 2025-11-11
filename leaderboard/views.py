@@ -118,10 +118,128 @@ def create_leaderboard(leaderboard, predictions=Prediction.objects.all(), last_w
         )
     
     return sorted_leaderboard
-
+"""
 def leaderboard(request):
     sorted_leaderboard = create_leaderboard([])
     return render(request, "leaderboard/table.html", {"leaderboard": sorted_leaderboard})
+"""
+
+def leaderboard(request):
+    today = timezone.now()
+    leaderboard = []
+
+    predictions = Prediction.objects.all()
+
+    for prediction in predictions:
+        #Adds the user into the leaderboard
+        if not prediction.user.can_participate:
+            continue
+        if not(check_user_in_leaderboard(prediction, leaderboard)):
+            leaderboard.append({"user":prediction.user, 
+                                "number_of_predictions": 0,
+                                "number_of_played_predictions": 0, 
+                                "postponed_games": 0, 
+                                "points_this_week": 0, 
+                                "score": 0, 
+                                "average_points_per_game": 0, 
+                                "distance_to_first": 0, 
+                                "distance_to_position_above": 0, 
+                                "perfect_predictions": 0, 
+                                "win_prediction_ratio": 0, 
+                                "position_last_week": 0, 
+                                "correct_winner": 0,
+                                "distance_to_placed_position": 0,
+                                "points_from_previous_weeks":0,
+                                "wb_color": "hsl(0, 0, 0)",
+                                "cp_color": "hsl(0, 0, 0)",
+                                "non_string_ratio": 0
+                                })
+        for entry in leaderboard:
+            if prediction.user == entry["user"]:
+                #increases the number of predictions by 1
+                entry["number_of_predictions"] += 1
+                if not (prediction.match.home_score is None):
+                    entry["number_of_played_predictions"] += 1
+                #increases score
+                prediction_points = evaluate_score(prediction)
+                entry["score"] += prediction_points
+                #increases points this week
+                if get_match_week_start(prediction.match.match_date) == get_match_week_start(today):
+                    entry["points_this_week"] += prediction_points
+                #Perfect predictions counter
+                if prediction_points >= 100:
+                    entry["perfect_predictions"] += 1
+                #Adds one if predicts correct winner, needed for other stat
+                if prediction_points != 0:
+                    entry["correct_winner"] += 1
+                #points this week
+                match_date = prediction.match.match_date
+                start_date = make_previous_friday(today).date()
+                end_date = (start_date + datetime.timedelta(days=6))
+                if start_date <= match_date <= end_date:
+                    entry["points_this_week"] += prediction_points
+                #postponed games
+                if prediction.match.postponed:
+                    entry["postponed_games"] += 1
+                
+                if get_match_week_start(prediction.match.match_date) <= get_match_week_start((today) - timedelta(days=7)).date():
+                    entry["points_from_previous_weeks"] += prediction_points
+                
+
+    
+    #ordering
+    
+
+
+        
+    #new loop for stats that don't need a prediction
+    pts_min = 1000000000000
+    pts_max = 0
+    cor_min = 1000000000000
+    cor_max = 0
+    for entry in leaderboard:
+        if entry["points_this_week"] > pts_max:
+            pts_max = entry["points_this_week"]
+        if entry["perfect_predictions"] > cor_max:
+            cor_max = entry["perfect_predictions"]
+        if entry["points_this_week"] < pts_min:
+            pts_min = entry["points_this_week"]
+        if entry["perfect_predictions"] < cor_min:
+            cor_min = entry["perfect_predictions"]
+
+        entry["average_points_per_game"] =  round(entry["score"] / entry["number_of_played_predictions"]) if entry["number_of_played_predictions"] else 0
+
+        entry["win_prediction_ratio"] = str(round((entry["correct_winner"] / entry["number_of_played_predictions"]*100))) + "%" if entry["number_of_played_predictions"] else 0
+
+        entry["non_string_ratio"] = round(entry["correct_winner"] / entry["number_of_played_predictions"], 2)*100 if entry["number_of_played_predictions"] else 0   
+
+    sorted_leaderboard = order_leaderboard(leaderboard)
+    for entry in sorted_leaderboard:
+        
+        entry["distance_to_first"] = leaderboard[0]["score"] - entry["score"]
+
+        entry["distance_to_position_above"] = 0 if sorted_leaderboard.index(entry) == 0 else (sorted_leaderboard[sorted_leaderboard.index(entry) - 1]["score"] - entry["score"])
+        entry["distance_to_placed_position"] = 0 if sorted_leaderboard.index(entry) <= 4 else (sorted_leaderboard[4]["score"] - entry["score"]) 
+    
+    #time to do colours
+
+    for entry in sorted_leaderboard:
+        entry["wb_color"] = scale_color(
+            entry["points_this_week"], 
+            pts_min,
+            pts_max,
+            [(0, 85, 60), (60, 85, 60), (120, 85, 60)]
+        )
+        entry["cp_color"] = scale_color(
+            entry["perfect_predictions"],
+            cor_min,
+            cor_max,
+            [(220, 85, 90), (220, 85, 40)],  # hue fixed at 220, lightness fades
+            fixed_hue=True
+        )
+
+    return render(request, "leaderboard/table.html", {"leaderboard": sorted_leaderboard})
+
 
 def check_user_in_leaderboard(prediction, leaderboard):
     user = prediction.user
