@@ -21,24 +21,24 @@ Date,Home,Away,League
 2025-12-15,Manchester United,AFC Bournemouth,Premier_League
 2025-12-20,AFC Bournemouth,Burnley,Premier_League
 2025-12-20,Brighton & Hove Albion,Sunderland,Premier_League
+2025-12-20,Everton,Arsenal,Premier_League
+2025-12-20,Leeds United,Crystal Palace,Premier_League
 2025-12-20,Manchester City,West Ham United,Premier_League
 2025-12-20,Newcastle United,Chelsea,Premier_League
 2025-12-20,Tottenham Hotspur,Liverpool,Premier_League
 2025-12-20,Wolverhampton Wanderers,Brentford,Premier_League
 2025-12-21,Aston Villa,Manchester United,Premier_League
-2025-12-21,Everton,Arsenal,Premier_League
-2025-12-21,Leeds United,Crystal Palace,Premier_League
 2025-12-22,Fulham,Nottingham Forest,Premier_League
+2025-12-26,Manchester United,Newcastle United,Premier_League
 2025-12-27,Arsenal,Brighton & Hove Albion,Premier_League
 2025-12-27,Brentford,AFC Bournemouth,Premier_League
 2025-12-27,Burnley,Everton,Premier_League
 2025-12-27,Chelsea,Aston Villa,Premier_League
-2025-12-27,Crystal Palace,Tottenham Hotspur,Premier_League
 2025-12-27,Liverpool,Wolverhampton Wanderers,Premier_League
-2025-12-27,Manchester United,Newcastle United,Premier_League
 2025-12-27,Nottingham Forest,Manchester City,Premier_League
-2025-12-27,Sunderland,Leeds United,Premier_League
 2025-12-27,West Ham United,Fulham,Premier_League
+2025-12-28,Crystal Palace,Tottenham Hotspur,Premier_League
+2025-12-28,Sunderland,Leeds United,Premier_League
 2025-12-01,Birmingham City,Watford,Championship
 2025-12-05,Hull City,Middlesbrough,Championship
 2025-12-06,Blackburn Rovers,Sheffield Wednesday,Championship
@@ -100,6 +100,8 @@ Date,Home,Away,League
 2025-12-29,Stoke City,Sheffield United,Championship
 2025-12-29,West Bromwich Albion,Queens Park Rangers,Championship
 2025-12-29,Wrexham,Preston North End,Championship
+2025-12-06,Cardiff City,Huddersfield Town,League_1
+2025-12-06,Plymouth Argyle,Bradford City,League_1
 2025-12-13,AFC Wimbledon,Mansfield Town,League_1
 2025-12-13,Barnsley,Leyton Orient,League_1
 2025-12-13,Blackpool,Lincoln City,League_1
@@ -147,6 +149,7 @@ Date,Home,Away,League
 2025-12-29,Peterborough United,Reading,League_1
 2025-12-29,Plymouth Argyle,Wycombe Wanderers,League_1
 2025-12-29,Stockport County,Doncaster Rovers,League_1
+2025-12-06,Colchester United,Gillingham,League_2
 2025-12-13,Accrington Stanley,Bromley,League_2
 2025-12-13,Bristol Rovers,Swindon Town,League_2
 2025-12-13,Cheltenham Town,Harrogate Town,League_2
@@ -202,17 +205,16 @@ Date,Home,Away,League
 2025-12-06,St Mirren,Dundee United,Scottish_Premier_League
 2025-12-07,Celtic,Heart of Midlothian,Scottish_Premier_League
 2025-12-13,Dundee United,Motherwell,Scottish_Premier_League
-2025-12-13,Heart of Midlothian,St Mirren,Scottish_Premier_League
+2025-12-13,Falkirk,Heart of Midlothian,Scottish_Premier_League
 2025-12-13,Livingston,Dundee,Scottish_Premier_League
 2025-12-14,Aberdeen,Kilmarnock,Scottish_Premier_League
-2025-12-14,Falkirk,Celtic,Scottish_Premier_League
-2025-12-14,Rangers,Hibernian,Scottish_Premier_League
+2025-12-15,Rangers,Hibernian,Scottish_Premier_League
 2025-12-20,Dundee United,Hibernian,Scottish_Premier_League
-2025-12-20,Heart of Midlothian,Rangers,Scottish_Premier_League
 2025-12-20,Kilmarnock,Falkirk,Scottish_Premier_League
 2025-12-20,Motherwell,Dundee,Scottish_Premier_League
 2025-12-20,St Mirren,Livingston,Scottish_Premier_League
 2025-12-21,Celtic,Aberdeen,Scottish_Premier_League
+2025-12-21,Heart of Midlothian,Rangers,Scottish_Premier_League
 2025-12-27,Aberdeen,Dundee United,Scottish_Premier_League
 2025-12-27,Dundee,Falkirk,Scottish_Premier_League
 2025-12-27,Hibernian,Heart of Midlothian,Scottish_Premier_League
