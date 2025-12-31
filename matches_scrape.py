@@ -68,7 +68,7 @@ def scrape_data(url, league):
     elif month_int == 11:
         month = number_to_month(1)
     elif month_int == 12:
-        month = number_to_month(12)
+        month = number_to_month(1)
     print(month)
 
     unsorted_rows = get_rows(url, month)
@@ -136,4 +136,4 @@ for key,value in urls.items():
 df = pd.DataFrame(data)
 
 os.makedirs('scraped_matches', exist_ok=True)
-df.to_csv('scraped_matches/matches_dec.csv', index=False)
+df.to_csv('scraped_matches/matches_jan.csv', index=False)
