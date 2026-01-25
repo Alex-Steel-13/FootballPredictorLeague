@@ -8,7 +8,9 @@ import datetime
 from django.utils import timezone
 from operator import itemgetter
 from django.contrib.auth.models import User
-
+from django.contrib.auth import get_user_model
+from django.db.models import Prefetch
+from collections import defaultdict
 
 # Create your views here.
 
@@ -407,3 +409,71 @@ def profile(request, username):
         'predictions': predictions_final,
     }
     return render(request, "leaderboard/profile.html", context)
+
+def create_leaderboard_2(predictions):
+    stats = defaultdict(lambda: { "number_of_predictions": 0,
+                                "number_of_played_predictions": 0, 
+                                "postponed_games": 0, 
+                                "points_this_week": 0, 
+                                "score": 0, 
+                                "average_points_per_game": 0, 
+                                "distance_to_first": 0, 
+                                "distance_to_position_above": 0, 
+                                "perfect_predictions": 0, 
+                                "win_prediction_ratio": 0, 
+                                "position_last_week": 0, 
+                                "correct_winner": 0,
+                                "distance_to_placed_position": 0,
+                                "points_from_previous_weeks":0,
+                                "wb_color": "hsl(0, 0, 0)",
+                                "cp_color": "hsl(0, 0, 0)",
+                                "non_string_ratio": 0
+                                })
+    today = timezone.now()
+    match_date = p.match.match_date.date()
+    start_date = make_previous_friday(today).date()
+    for p in predictions.select_related("user", "match"): 
+        s = stats[p.user]
+        p_points = evaluate_score(p)
+        s["number_of_predictions"] += 1
+        s["score"] += p_points
+        if p_points >= 100:
+            s["perfect_predictions"] +=1
+        if p_points != 0:
+            s["correct_winner"] +=1
+        end_date = (start_date + datetime.timedelta(days=6))
+        if start_date <= match_date <= end_date:
+            s["points_this_week"] += p_points
+        if not (p.match.home_score is None):
+                    s["number_of_played_predictions"] += 1
+        
+
+    leaderboard = [{"user": user, **s} for user, s in stats.items()]
+    for entry in leaderboard:
+        entry["win_prediction_ratio"] = str(round((entry["correct_winner"] / entry["number_of_played_predictions"]*100))) + "%" if entry["number_of_played_predictions"] else "0%"
+        entry["non_string_ratio"] = round(entry["correct_winner"] / entry["number_of_played_predictions"], 2)*100 if entry["number_of_played_predictions"] else 0
+    sorted_leaderboard = order_leaderboard(leaderboard)
+    try:
+        fifth_score = sorted_leaderboard[4]["score"]
+    except:
+        fifth_score = sorted_leaderboard[-1]["score"]
+    count = 0
+    for entry in sorted_leaderboard:
+        entry["average_points_per_game"] = entry["score"] // entry["number_of_played_predictions"]
+        entry["distance_to_first"] = sorted_leaderboard[0]["score"] - entry["score"]
+        entry["distance_to_placed_position"] = 0 if fifth_score - entry["score"] <= 0 else fifth_score - entry["score"]
+        if count != 0:
+            entry["distance_to_position_above"] = sorted_leaderboard[count-1]["score"] - entry["score"]
+        else:
+            0
+        count+=1
+    return sorted_leaderboard
+    
+
+def leaderboard_view(request):
+    preds = (Prediction.objects
+             .select_related("user", "match")   # add "match__result" etc if needed           # or season/week filter
+             .order_by("user_id"))
+    leaderboard = create_leaderboard_2(preds)
+    return render(request, "leaderboard/table.html", {"leaderboard": leaderboard})
+    
