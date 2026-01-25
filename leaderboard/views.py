@@ -430,8 +430,9 @@ def create_leaderboard_2(predictions):
                                 "non_string_ratio": 0
                                 })
     today = timezone.now()
-    match_date = p.match.match_date.date()
+    
     start_date = make_previous_friday(today).date()
+    end_date = (start_date + datetime.timedelta(days=6))
     for p in predictions.select_related("user", "match"): 
         s = stats[p.user]
         p_points = evaluate_score(p)
@@ -441,7 +442,7 @@ def create_leaderboard_2(predictions):
             s["perfect_predictions"] +=1
         if p_points != 0:
             s["correct_winner"] +=1
-        end_date = (start_date + datetime.timedelta(days=6))
+        match_date = p.match.match_date.date()
         if start_date <= match_date <= end_date:
             s["points_this_week"] += p_points
         if not (p.match.home_score is None):
