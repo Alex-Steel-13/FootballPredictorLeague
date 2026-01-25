@@ -442,7 +442,7 @@ def create_leaderboard_2(predictions):
             s["perfect_predictions"] +=1
         if p_points != 0:
             s["correct_winner"] +=1
-        match_date = p.match.match_date.date()
+        match_date = p.match.match_date
         if start_date <= match_date <= end_date:
             s["points_this_week"] += p_points
         if not (p.match.home_score is None):
