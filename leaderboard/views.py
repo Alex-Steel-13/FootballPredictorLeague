@@ -125,7 +125,7 @@ def leaderboard(request):
     sorted_leaderboard = create_leaderboard([])
     return render(request, "leaderboard/table.html", {"leaderboard": sorted_leaderboard})
 """
-
+"""
 def leaderboard(request):
     today = timezone.now()
     leaderboard = []
@@ -241,7 +241,7 @@ def leaderboard(request):
         )
 
     return render(request, "leaderboard/table.html", {"leaderboard": sorted_leaderboard})
-
+"""
 
 def check_user_in_leaderboard(prediction, leaderboard):
     user = prediction.user
@@ -467,6 +467,26 @@ def create_leaderboard_2(predictions):
         else:
             0
         count+=1
+    
+    pts_min = 1000000000000
+    pts_max = 0
+    cor_min = 1000000000000
+    cor_max = 0
+
+    for entry in sorted_leaderboard:
+        entry["wb_color"] = scale_color(
+            entry["points_this_week"], 
+            pts_min,
+            pts_max,
+            [(0, 85, 60), (60, 85, 60), (120, 85, 60)]
+        )
+        entry["cp_color"] = scale_color(
+            entry["perfect_predictions"],
+            cor_min,
+            cor_max,
+            [(220, 85, 90), (220, 85, 40)],  # hue fixed at 220, lightness fades
+            fixed_hue=True
+        )
     return sorted_leaderboard
     
 
