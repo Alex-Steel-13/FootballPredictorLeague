@@ -460,7 +460,7 @@ def create_leaderboard_2(predictions):
         fifth_score = sorted_leaderboard[-1]["score"]
     count = 0
     for entry in sorted_leaderboard:
-        entry["average_points_per_game"] = entry["score"] // entry["number_of_played_predictions"]
+        entry["average_points_per_game"] = entry["score"] // entry["number_of_played_predictions"] if entry["number_of_played_predictions"] != 0 else 0
         entry["distance_to_first"] = sorted_leaderboard[0]["score"] - entry["score"]
         entry["distance_to_placed_position"] = 0 if fifth_score - entry["score"] <= 0 else fifth_score - entry["score"]
         if count != 0:
