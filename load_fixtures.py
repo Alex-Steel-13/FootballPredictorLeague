@@ -2,7 +2,7 @@ import csv
 from predictions.models import Match
 
 def run():
-    with open('scraped_matches/matches_feb.csv', newline="", encoding="utf-8") as csvfile:
+    with open('scraped_matches/matches_mar.csv', newline="", encoding="utf-8") as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
             Match.objects.create(
