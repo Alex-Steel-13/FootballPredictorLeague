@@ -158,6 +158,17 @@ def build_leaderboard(today=None):
     if not leaderboard:
         return leaderboard
 
+    # Position last week: rank everyone by the cumulative score they had
+    # *before* this week's matches (points_from_previous_weeks) - i.e. the
+    # table as it stood after last week's games. Ties break alphabetically
+    # so the ranking is stable.
+    last_week_order = sorted(
+        leaderboard,
+        key=lambda e: (-e["points_from_previous_weeks"], e["user"].username),
+    )
+    for rank, entry in enumerate(last_week_order, start=1):
+        entry["position_last_week"] = rank
+
     # Single O(n) pass for gap stats + colour ranges.
     first_score = leaderboard[0]["score"]
     fifth_score = leaderboard[4]["score"] if len(leaderboard) > 4 else leaderboard[-1]["score"]

@@ -6,7 +6,7 @@ from predictorleague import settings
 
 # Points awarded for each kind of correct prediction.
 POINTS_CORRECT_RESULT_HOME_WIN = 50
-POINTS_CORRECT_RESULT_DRAW = 75
+POINTS_CORRECT_RESULT_DRAW = 100
 POINTS_CORRECT_RESULT_AWAY_WIN = 75
 POINTS_EXACT_SCORE = 50
 
