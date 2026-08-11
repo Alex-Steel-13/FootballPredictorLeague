@@ -1,340 +1,45 @@
-from django.shortcuts import render
-from django.shortcuts import render, get_object_or_404
-from . import Evaluate_Scores
-from .models import LeaderboardEntry
-from predictions.models import Prediction
-from datetime import timedelta
 import datetime
-from django.utils import timezone
-from operator import itemgetter
-from django.contrib.auth.models import User
+
+from django.shortcuts import render, get_object_or_404
 from django.contrib.auth import get_user_model
-from django.db.models import Prefetch
-from collections import defaultdict
+from django.db.models import Count, Sum, Q
+from django.utils import timezone
 
-# Create your views here.
+from .models import Prediction
 
-def create_leaderboard(leaderboard, predictions=Prediction.objects.all(), last_week=False):
-    today = timezone.now()
+User = get_user_model()
 
-    for prediction in predictions:
-        #Adds the user into the leaderboard
-        if not prediction.user.can_participate:
-            continue
-        if not(check_user_in_leaderboard(prediction, leaderboard)):
-            leaderboard.append({"user":prediction.user, 
-                                "number_of_predictions": 0,
-                                "number_of_played_predictions": 0, 
-                                "postponed_games": 0, 
-                                "points_this_week": 0, 
-                                "score": 0, 
-                                "average_points_per_game": 0, 
-                                "distance_to_first": 0, 
-                                "distance_to_position_above": 0, 
-                                "perfect_predictions": 0, 
-                                "win_prediction_ratio": 0, 
-                                "position_last_week": 0, 
-                                "correct_winner": 0,
-                                "distance_to_placed_position": 0,
-                                "points_from_previous_weeks":0,
-                                "wb_color": "hsl(0, 0, 0)",
-                                "cp_color": "hsl(0, 0, 0)",
-                                "non_string_ratio": 0
-                                })
-        for entry in leaderboard:
-            if prediction.user == entry["user"]:
-                #increases the number of predictions by 1
-                entry["number_of_predictions"] += 1
-                if not (prediction.match.home_score is None):
-                    entry["number_of_played_predictions"] += 1
-                #increases score
-                prediction_points = evaluate_score(prediction)
-                entry["score"] += prediction_points
-                #increases points this week
-                if get_match_week_start(prediction.match.match_date) == get_match_week_start(today):
-                    entry["points_this_week"] += prediction_points
-                #Perfect predictions counter
-                if prediction_points >= 100:
-                    entry["perfect_predictions"] += 1
-                #Adds one if predicts correct winner, needed for other stat
-                if prediction_points != 0:
-                    entry["correct_winner"] += 1
-                #points this week
-                match_date = prediction.match.match_date
-                start_date = make_previous_friday(today).date()
-                end_date = (start_date + datetime.timedelta(days=6))
-                if start_date <= match_date <= end_date:
-                    entry["points_this_week"] += prediction_points
-                #postponed games
-                if prediction.match.postponed:
-                    entry["postponed_games"] += 1
-                
-                if get_match_week_start(prediction.match.match_date) <= get_match_week_start((today) - timedelta(days=7)).date():
-                    entry["points_from_previous_weeks"] += prediction_points
-                
-        
-    #new loop for stats that don't need a prediction
-    pts_min = 1000000000000
-    pts_max = 0
-    cor_min = 1000000000000
-    cor_max = 0
-    for entry in leaderboard:
-        if entry["points_this_week"] > pts_max:
-            pts_max = entry["points_this_week"]
-        if entry["perfect_predictions"] > cor_max:
-            cor_max = entry["perfect_predictions"]
-        if entry["points_this_week"] < pts_min:
-            pts_min = entry["points_this_week"]
-        if entry["perfect_predictions"] < cor_min:
-            cor_min = entry["perfect_predictions"]
-
-        entry["average_points_per_game"] =  round(entry["score"] / entry["number_of_played_predictions"]) if entry["number_of_played_predictions"] else 0
-
-        entry["win_prediction_ratio"] = str(round((entry["correct_winner"] / entry["number_of_played_predictions"])*100)) + "%" if entry["number_of_played_predictions"] else 0
-
-        entry["non_string_ratio"] = round(entry["correct_winner"] / entry["number_of_played_predictions"], 2)*100 if entry["number_of_played_predictions"] else 0   
-
-    sorted_leaderboard = order_leaderboard(leaderboard)
-    for entry in sorted_leaderboard:
-        
-        entry["distance_to_first"] = sorted_leaderboard[0]["score"] - entry["score"]
-
-        entry["distance_to_position_above"] = 0 if sorted_leaderboard.index(entry) == 0 else (sorted_leaderboard[sorted_leaderboard.index(entry) - 1]["score"] - entry["score"])
-        entry["distance_to_placed_position"] = 0 if sorted_leaderboard.index(entry) <= 4 else (sorted_leaderboard[4]["score"] - entry["score"]) 
-    
-    #time to do colours
-
-    for entry in sorted_leaderboard:
-        entry["wb_color"] = scale_color(
-            entry["points_this_week"], 
-            pts_min,
-            pts_max,
-            [(0, 85, 60), (60, 85, 60), (120, 85, 60)]
-        )
-        entry["cp_color"] = scale_color(
-            entry["perfect_predictions"],
-            cor_min,
-            cor_max,
-            [(220, 85, 90), (220, 85, 40)],  # hue fixed at 220, lightness fades
-            fixed_hue=True
-        )
-    
-    return sorted_leaderboard
-"""
-def leaderboard(request):
-    sorted_leaderboard = create_leaderboard([])
-    return render(request, "leaderboard/table.html", {"leaderboard": sorted_leaderboard})
-"""
-"""
-def leaderboard(request):
-    today = timezone.now()
-    leaderboard = []
-
-    predictions = Prediction.objects.all()
-
-    for prediction in predictions:
-        #Adds the user into the leaderboard
-        if not prediction.user.can_participate:
-            continue
-        if not(check_user_in_leaderboard(prediction, leaderboard)):
-            leaderboard.append({"user":prediction.user, 
-                                "number_of_predictions": 0,
-                                "number_of_played_predictions": 0, 
-                                "postponed_games": 0, 
-                                "points_this_week": 0, 
-                                "score": 0, 
-                                "average_points_per_game": 0, 
-                                "distance_to_first": 0, 
-                                "distance_to_position_above": 0, 
-                                "perfect_predictions": 0, 
-                                "win_prediction_ratio": 0, 
-                                "position_last_week": 0, 
-                                "correct_winner": 0,
-                                "distance_to_placed_position": 0,
-                                "points_from_previous_weeks":0,
-                                "wb_color": "hsl(0, 0, 0)",
-                                "cp_color": "hsl(0, 0, 0)",
-                                "non_string_ratio": 0
-                                })
-        for entry in leaderboard:
-            if prediction.user == entry["user"]:
-                #increases the number of predictions by 1
-                entry["number_of_predictions"] += 1
-                if not (prediction.match.home_score is None):
-                    entry["number_of_played_predictions"] += 1
-                #increases score
-                prediction_points = evaluate_score(prediction)
-                entry["score"] += prediction_points
-                #increases points this week
-                if get_match_week_start(prediction.match.match_date) == get_match_week_start(today):
-                    entry["points_this_week"] += prediction_points
-                #Perfect predictions counter
-                if prediction_points >= 100:
-                    entry["perfect_predictions"] += 1
-                #Adds one if predicts correct winner, needed for other stat
-                if prediction_points != 0:
-                    entry["correct_winner"] += 1
-                #points this week
-                match_date = prediction.match.match_date
-                start_date = make_previous_friday(today).date()
-                end_date = (start_date + datetime.timedelta(days=6))
-                if start_date <= match_date <= end_date:
-                    entry["points_this_week"] += prediction_points
-                #postponed games
-                if prediction.match.postponed:
-                    entry["postponed_games"] += 1
-                
-                if get_match_week_start(prediction.match.match_date) <= get_match_week_start((today) - timedelta(days=7)).date():
-                    entry["points_from_previous_weeks"] += prediction_points
-                
-
-    
-    #ordering
-    
-
-
-        
-    #new loop for stats that don't need a prediction
-    pts_min = 1000000000000
-    pts_max = 0
-    cor_min = 1000000000000
-    cor_max = 0
-    for entry in leaderboard:
-        if entry["points_this_week"] > pts_max:
-            pts_max = entry["points_this_week"]
-        if entry["perfect_predictions"] > cor_max:
-            cor_max = entry["perfect_predictions"]
-        if entry["points_this_week"] < pts_min:
-            pts_min = entry["points_this_week"]
-        if entry["perfect_predictions"] < cor_min:
-            cor_min = entry["perfect_predictions"]
-
-        entry["average_points_per_game"] =  round(entry["score"] / entry["number_of_played_predictions"]) if entry["number_of_played_predictions"] else 0
-
-        entry["win_prediction_ratio"] = str(round((entry["correct_winner"] / entry["number_of_played_predictions"]*100))) + "%" if entry["number_of_played_predictions"] else 0
-
-        entry["non_string_ratio"] = round(entry["correct_winner"] / entry["number_of_played_predictions"], 2)*100 if entry["number_of_played_predictions"] else 0   
-
-    sorted_leaderboard = order_leaderboard(leaderboard)
-    for entry in sorted_leaderboard:
-        
-        entry["distance_to_first"] = leaderboard[0]["score"] - entry["score"]
-
-        entry["distance_to_position_above"] = 0 if sorted_leaderboard.index(entry) == 0 else (sorted_leaderboard[sorted_leaderboard.index(entry) - 1]["score"] - entry["score"])
-        entry["distance_to_placed_position"] = 0 if sorted_leaderboard.index(entry) <= 4 else (sorted_leaderboard[4]["score"] - entry["score"]) 
-    
-    #time to do colours
-
-    for entry in sorted_leaderboard:
-        entry["wb_color"] = scale_color(
-            entry["points_this_week"], 
-            pts_min,
-            pts_max,
-            [(0, 85, 60), (60, 85, 60), (120, 85, 60)]
-        )
-        entry["cp_color"] = scale_color(
-            entry["perfect_predictions"],
-            cor_min,
-            cor_max,
-            [(220, 85, 90), (220, 85, 40)],  # hue fixed at 220, lightness fades
-            fixed_hue=True
-        )
-
-    return render(request, "leaderboard/table.html", {"leaderboard": sorted_leaderboard})
-"""
-
-def check_user_in_leaderboard(prediction, leaderboard):
-    user = prediction.user
-    for entry in leaderboard:
-        if entry["user"] == user:
-            return True
-    return False
-
-def evaluate_score(prediction):
-    score = 0
-    if prediction.match.home_score == None or prediction.match.away_score == None:
-        return score
-    
-    home_team_won = home_won(prediction.match.home_score, prediction.match.away_score)
-    predicted_home_won = home_won(prediction.predicted_home_score, prediction.predicted_away_score)
-    if home_team_won and predicted_home_won:
-        score += 50
-    
-    actual_draw = draw(prediction.match.home_score, prediction.match.away_score)
-    predicted_draw = draw(prediction.predicted_home_score, prediction.predicted_away_score)
-    if actual_draw and predicted_draw:
-        score += 75
-    
-    away_team_won = away_won(prediction.match.home_score, prediction.match.away_score)
-    predicted_away_won = away_won(prediction.predicted_home_score, prediction.predicted_away_score)
-    if away_team_won and predicted_away_won:
-        score += 75
-
-    if prediction.predicted_home_score == prediction.match.home_score and prediction.predicted_away_score == prediction.match.away_score:
-        score +=50
-    return score
-
-def home_won(home_score, away_score):
-    if home_score > away_score:
-        return True
-    else:
-        return False
-
-def draw(home_score, away_score):
-    return home_score == away_score
-
-def away_won(home_score, away_score):
-    if home_score < away_score:
-        return True
-    else:
-        return False
-
-
-def predictions(request):
-    predictions = Prediction.objects.select_related("match")
-    today = timezone.now().date()
-    match_week = get_match_week_start(make_previous_saturday(today)) 
-    predictions_this_week = []
-    for prediction in predictions:
-        if match_week == get_match_week_start(prediction.match.match_date):
-            predictions_this_week.append({"prediction":prediction})
-    leaderboard = create_leaderboard([])
-    user_rankings = {}
-    count = 1
-    for entry in leaderboard:
-        user_rankings[entry["user"].id] = count
-        count += 1
-    for prediction in predictions_this_week:
-        prediction["rank"] = user_rankings[prediction["prediction"].user.id]
-    predictions_this_week.sort(key=lambda item: item["rank"])
-
-    return render(request, "leaderboard/predictions.html", {"predictions": predictions_this_week})
-
+# ---------------------------------------------------------------------------
+# Match-week helpers (Friday -> Monday window)
+# ---------------------------------------------------------------------------
 def get_match_week_start(d):
-    """Returns the Friday of the week the date falls in (Friday–Monday window)."""
+    """Return the Friday of the match week the date falls in (Fri-Mon window)."""
     weekday = d.weekday()  # Monday=0 ... Sunday=6
+    if weekday != 0 and weekday <= 3:  # Tue(1)-Thu(3) belong to the NEXT week
+        return d + datetime.timedelta(days=4 - weekday)
+    # Fri(4), Sat(5), Sun(6), Mon(0) belong to the CURRENT match week
+    days_since_friday = (weekday - 4) % 7
+    return d - datetime.timedelta(days=days_since_friday)
 
-    if weekday <= 3 and weekday != 0:  # Tuesday (1) to Thursday (3)
-        # These should be considered part of the *next* match week
-        days_until_friday = 4 - weekday
-        return d + timedelta(days=days_until_friday)
-
-    else:  # Friday (4), Saturday (5), Sunday (6), Monday(0)
-        # These belong to the *current* match week
-        days_since_friday = (weekday - 4) % 7
-        return d - timedelta(days=days_since_friday)
-
-def make_previous_saturday(d):
-    days_to_subtract = (d.weekday() - 5) % 7
-    return d - datetime.timedelta(days=days_to_subtract)
 
 def make_previous_friday(d):
-    days_to_subtract = (d.weekday() - 4) % 7
-    return d - datetime.timedelta(days=days_to_subtract)
+    return d - datetime.timedelta(days=(d.weekday() - 4) % 7)
 
-def order_leaderboard(leaderboard):
-    return sorted(leaderboard, key=itemgetter("score", "non_string_ratio", "perfect_predictions"), reverse=True)
 
+def make_previous_saturday(d):
+    return d - datetime.timedelta(days=(d.weekday() - 5) % 7)
+
+
+def current_week_window(today=None):
+    """(start_date, end_date) for the current match week, as dates."""
+    today = today or timezone.now()
+    start = make_previous_friday(today).date()
+    return start, start + datetime.timedelta(days=6)
+
+
+# ---------------------------------------------------------------------------
+# Colour scaling
+# ---------------------------------------------------------------------------
 def scale_color(value, vmin, vmax, colors, fixed_hue=False):
     """Map a value to a color using a 2-stop or 3-stop gradient."""
     try:
@@ -344,157 +49,222 @@ def scale_color(value, vmin, vmax, colors, fixed_hue=False):
     t = max(0, min(1, t))  # clamp between 0 and 1
 
     if fixed_hue:
-        # Keep hue from first color in list, vary lightness only
         hue, sat, light_start = colors[0]
         _, _, light_end = colors[-1]
         lightness = light_start + t * (light_end - light_start)
         return f"hsl({hue}, {sat}%, {lightness}%)"
 
     if len(colors) == 2:
-        # Simple 2-color gradient
         (h1, s1, l1), (h2, s2, l2) = colors
-        hue = h1 + t * (h2 - h1)
-        sat = s1 + t * (s2 - s1)
-        lig = l1 + t * (l2 - l1)
-        return f"hsl({hue:.0f}, {sat:.0f}%, {lig:.0f}%)"
+        return (
+            f"hsl({h1 + t * (h2 - h1):.0f}, "
+            f"{s1 + t * (s2 - s1):.0f}%, {l1 + t * (l2 - l1):.0f}%)"
+        )
 
-    elif len(colors) == 3:
-        # 3-color gradient, split halfway
+    if len(colors) == 3:
         if t <= 0.5:
             t2 = t / 0.5
             (h1, s1, l1), (h2, s2, l2) = colors[0], colors[1]
         else:
             t2 = (t - 0.5) / 0.5
             (h1, s1, l1), (h2, s2, l2) = colors[1], colors[2]
-        hue = h1 + t2 * (h2 - h1)
-        sat = s1 + t2 * (s2 - s1)
-        lig = l1 + t2 * (l2 - l1)
-        return f"hsl({hue:.0f}, {sat:.0f}%, {lig:.0f}%)"
+        return (
+            f"hsl({h1 + t2 * (h2 - h1):.0f}, "
+            f"{s1 + t2 * (s2 - s1):.0f}%, {l1 + t2 * (l2 - l1):.0f}%)"
+        )
 
-    else:
-        # Fallback: just return first color
-        h, s, l = colors[0]
-        return f"hsl({h}, {s}%, {l}%)"
-    
-def manager_of_month(request):
-    table = []
-    
-    predictions = Prediction.objects.all()
-    for prediction in predictions:
-        if get_match_week_start(prediction.match.match_date).month == (get_match_week_start(timezone.now()).month-1):
-            if not prediction.user.can_participate:
-                continue
-            if not(check_user_in_leaderboard(prediction, table)):
-                table.append({
-                                "user":prediction.user, 
-                                "score": 0,   
-                            })
-            for entry in table:
-                if entry["user"] == prediction.user:
-                    entry["score"] += evaluate_score(prediction)
-    
-    ordered_table = sorted(table, key= lambda x: x["score"], reverse=True )
-    return render(request, "leaderboard/manager_of_the_month.html", {"table": ordered_table})
+    h, s, l = colors[0]
+    return f"hsl({h}, {s}%, {l}%)"
 
-def profile(request, username):
-    today = timezone.now()
-    profile_user = get_object_or_404(User, username=username)
-    predictions = Prediction.objects.filter(user__username=username).order_by("-match__match_date")
-    predictions_final = []
-    for prediction in predictions:
-        if not(get_match_week_start(prediction.match.match_date) == get_match_week_start(today)):
-            predictions_final.append(prediction)
-    context = {
-        'profile_user': profile_user,
-        'predictions': predictions_final,
-    }
-    return render(request, "leaderboard/profile.html", context)
 
-def create_leaderboard_2(predictions):
-    stats = defaultdict(lambda: { "number_of_predictions": 0,
-                                "number_of_played_predictions": 0, 
-                                "postponed_games": 0, 
-                                "points_this_week": 0, 
-                                "score": 0, 
-                                "average_points_per_game": 0, 
-                                "distance_to_first": 0, 
-                                "distance_to_position_above": 0, 
-                                "perfect_predictions": 0, 
-                                "win_prediction_ratio": 0, 
-                                "position_last_week": 0, 
-                                "correct_winner": 0,
-                                "distance_to_placed_position": 0,
-                                "points_from_previous_weeks":0,
-                                "wb_color": "hsl(0, 0, 0)",
-                                "cp_color": "hsl(0, 0, 0)",
-                                "non_string_ratio": 0
-                                })
-    today = timezone.now()
-    
-    start_date = make_previous_friday(today).date()
-    end_date = (start_date + datetime.timedelta(days=6))
-    for p in predictions.select_related("user", "match"): 
-        s = stats[p.user]
-        p_points = evaluate_score(p)
-        s["number_of_predictions"] += 1
-        s["score"] += p_points
-        if p_points >= 100:
-            s["perfect_predictions"] +=1
-        if p_points != 0:
-            s["correct_winner"] +=1
-        match_date = p.match.match_date
-        if start_date <= match_date <= end_date:
-            s["points_this_week"] += p_points
-        if not (p.match.home_score is None):
-                    s["number_of_played_predictions"] += 1
-        
+# ---------------------------------------------------------------------------
+# Leaderboard
+# ---------------------------------------------------------------------------
+def build_leaderboard(today=None):
+    """Build the full, sorted leaderboard.
 
-    leaderboard = [{"user": user, **s} for user, s in stats.items()]
-    for entry in leaderboard:
-        entry["win_prediction_ratio"] = str(round((entry["correct_winner"] / entry["number_of_played_predictions"]*100))) + "%" if entry["number_of_played_predictions"] else "0%"
-        entry["non_string_ratio"] = round(entry["correct_winner"] / entry["number_of_played_predictions"], 2)*100 if entry["number_of_played_predictions"] else 0
-    sorted_leaderboard = order_leaderboard(leaderboard)
-    try:
-        fifth_score = sorted_leaderboard[4]["score"]
-    except:
-        fifth_score = sorted_leaderboard[-1]["score"]
-    count = 0
-    for entry in sorted_leaderboard:
-        entry["average_points_per_game"] = entry["score"] // entry["number_of_played_predictions"] if entry["number_of_played_predictions"] != 0 else 0
-        entry["distance_to_first"] = sorted_leaderboard[0]["score"] - entry["score"]
-        entry["distance_to_placed_position"] = 0 if fifth_score - entry["score"] <= 0 else fifth_score - entry["score"]
-        if count != 0:
-            entry["distance_to_position_above"] = sorted_leaderboard[count-1]["score"] - entry["score"]
-        else:
-            0
-        count+=1
-    
-    pts_min = 1000000000000
-    pts_max = 0
-    cor_min = 1000000000000
-    cor_max = 0
+    All the per-prediction work happens in the database via aggregation over
+    the stored `points` column. Python only does the cheap O(n) post-processing
+    (sorting, gap-to-rival stats, colours).
+    """
+    today = today or timezone.now()
+    week_start, week_end = current_week_window(today)
+    prev_week_cutoff = get_match_week_start(today - datetime.timedelta(days=7))
+    if hasattr(prev_week_cutoff, "date"):
+        prev_week_cutoff = prev_week_cutoff.date()
 
-    for entry in sorted_leaderboard:
+    # One query: group predictions by user, aggregate every stat we need.
+    rows = (
+        Prediction.objects
+        .filter(user__can_participate=True)
+        .values("user_id", "user__username")
+        .annotate(
+            number_of_predictions=Count("id"),
+            number_of_played_predictions=Count(
+                "id", filter=Q(match__home_score__isnull=False)
+            ),
+            postponed_games=Count("id", filter=Q(match__postponed=True)),
+            score=Sum("points"),
+            points_this_week=Sum(
+                "points",
+                filter=Q(match__match_date__gte=week_start,
+                         match__match_date__lte=week_end),
+            ),
+            points_from_previous_weeks=Sum(
+                "points", filter=Q(match__match_date__lt=week_start)
+            ),
+            perfect_predictions=Count("id", filter=Q(points__gte=100)),
+            correct_winner=Count("id", filter=Q(points__gt=0)),
+        )
+    )
+
+    # Materialise into the dict shape the template expects, coercing the
+    # SUM-of-nothing NULLs to 0.
+    user_ids = [r["user_id"] for r in rows]
+    users = User.objects.in_bulk(user_ids)
+
+    leaderboard = []
+    for r in rows:
+        played = r["number_of_played_predictions"]
+        correct = r["correct_winner"]
+        non_string_ratio = round(correct / played, 2) * 100 if played else 0
+        leaderboard.append({
+            "user": users[r["user_id"]],
+            "number_of_predictions": r["number_of_predictions"],
+            "number_of_played_predictions": played,
+            "postponed_games": r["postponed_games"],
+            "points_this_week": r["points_this_week"] or 0,
+            "score": r["score"] or 0,
+            "points_from_previous_weeks": r["points_from_previous_weeks"] or 0,
+            "perfect_predictions": r["perfect_predictions"],
+            "correct_winner": correct,
+            "average_points_per_game": (r["score"] or 0) // played if played else 0,
+            "win_prediction_ratio": f"{round(correct / played * 100)}%" if played else "0%",
+            "non_string_ratio": non_string_ratio,
+            # filled in below
+            "distance_to_first": 0,
+            "distance_to_position_above": 0,
+            "distance_to_placed_position": 0,
+            "position_last_week": 0,
+            "wb_color": "hsl(0, 0, 0)",
+            "cp_color": "hsl(0, 0, 0)",
+        })
+
+    leaderboard.sort(
+        key=lambda e: (e["score"], e["non_string_ratio"], e["perfect_predictions"]),
+        reverse=True,
+    )
+
+    if not leaderboard:
+        return leaderboard
+
+    # Single O(n) pass for gap stats + colour ranges.
+    first_score = leaderboard[0]["score"]
+    fifth_score = leaderboard[4]["score"] if len(leaderboard) > 4 else leaderboard[-1]["score"]
+    pts_values = [e["points_this_week"] for e in leaderboard]
+    cor_values = [e["perfect_predictions"] for e in leaderboard]
+    pts_min, pts_max = min(pts_values), max(pts_values)
+    cor_min, cor_max = min(cor_values), max(cor_values)
+
+    for i, entry in enumerate(leaderboard):
+        entry["distance_to_first"] = first_score - entry["score"]
+        entry["distance_to_position_above"] = (
+            0 if i == 0 else leaderboard[i - 1]["score"] - entry["score"]
+        )
+        gap_to_fifth = fifth_score - entry["score"]
+        entry["distance_to_placed_position"] = 0 if gap_to_fifth <= 0 else gap_to_fifth
+
         entry["wb_color"] = scale_color(
-            entry["points_this_week"], 
-            pts_min,
-            pts_max,
-            [(0, 85, 60), (60, 85, 60), (120, 85, 60)]
+            entry["points_this_week"], pts_min, pts_max,
+            [(0, 85, 60), (60, 85, 60), (120, 85, 60)],
         )
         entry["cp_color"] = scale_color(
-            entry["perfect_predictions"],
-            cor_min,
-            cor_max,
-            [(220, 85, 90), (220, 85, 40)],  # hue fixed at 220, lightness fades
-            fixed_hue=True
+            entry["perfect_predictions"], cor_min, cor_max,
+            [(220, 85, 90), (220, 85, 40)], fixed_hue=True,
         )
-    return sorted_leaderboard
-    
+
+    return leaderboard
+
 
 def leaderboard_view(request):
-    preds = (Prediction.objects
-             .select_related("user", "match")   # add "match__result" etc if needed           # or season/week filter
-             .order_by("user_id"))
-    leaderboard = create_leaderboard_2(preds)
-    return render(request, "leaderboard/table.html", {"leaderboard": leaderboard})
-    
+    return render(
+        request, "leaderboard/table.html",
+        {"leaderboard": build_leaderboard()},
+    )
+
+
+# ---------------------------------------------------------------------------
+# Manager of the month
+# ---------------------------------------------------------------------------
+def manager_of_month(request):
+    today = timezone.now()
+    target_month = (get_match_week_start(today).month - 1) or 12
+
+    rows = (
+        Prediction.objects
+        .filter(user__can_participate=True,
+                match__match_date__month=target_month)
+        .values("user_id")
+        .annotate(score=Sum("points"))
+        .order_by("-score")
+    )
+    users = User.objects.in_bulk([r["user_id"] for r in rows])
+    table = [{"user": users[r["user_id"]], "score": r["score"] or 0} for r in rows]
+
+    return render(
+        request, "leaderboard/manager_of_the_month.html", {"table": table},
+    )
+
+
+# ---------------------------------------------------------------------------
+# Profile
+# ---------------------------------------------------------------------------
+def profile(request, username):
+    today = timezone.now()
+    this_week = get_match_week_start(today)
+    profile_user = get_object_or_404(User, username=username)
+
+    predictions = (
+        Prediction.objects
+        .filter(user__username=username)
+        .select_related("match")
+        .order_by("-match__match_date")
+    )
+    predictions_final = [
+        p for p in predictions
+        if get_match_week_start(p.match.match_date) != this_week
+    ]
+
+    return render(request, "leaderboard/profile.html", {
+        "profile_user": profile_user,
+        "predictions": predictions_final,
+    })
+
+
+# ---------------------------------------------------------------------------
+# This week's predictions, ranked by the user's leaderboard position
+# ---------------------------------------------------------------------------
+def predictions(request):
+    today = timezone.now().date()
+    match_week = get_match_week_start(make_previous_saturday(today))
+
+    # Rank lookup comes from the single leaderboard build (no second rebuild).
+    leaderboard = build_leaderboard()
+    user_rankings = {
+        entry["user"].id: rank for rank, entry in enumerate(leaderboard, start=1)
+    }
+
+    this_week_preds = (
+        Prediction.objects
+        .select_related("match", "user")
+        .filter(match__match_date__gte=match_week,
+                match__match_date__lte=match_week + datetime.timedelta(days=3))
+    )
+
+    rows = [
+        {"prediction": p, "rank": user_rankings.get(p.user_id, len(leaderboard) + 1)}
+        for p in this_week_preds
+    ]
+    rows.sort(key=lambda item: item["rank"])
+
+    return render(request, "leaderboard/predictions.html", {"predictions": rows})

@@ -8,9 +8,10 @@ class MatchAdmin(admin.ModelAdmin):
         ("Predicted", {"fields": ["predicted"]}),
         ("Teams", {"fields": ["home_team", "away_team"]}),
         ("Scores", {"fields": ["home_score", "away_score"]}),
+        ("League", {"fields": ["league"]})
     ]
 
-    list_display = ["home_team", "away_team", "match_date", "home_score", "away_score", "predicted"]
+    list_display = ["home_team", "away_team", "league", "match_date", "home_score", "away_score", "predicted"]
 
     list_filter = ["predicted", "match_date"]
 
