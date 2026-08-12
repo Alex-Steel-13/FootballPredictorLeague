@@ -3,19 +3,193 @@
 {% block title %}Predict Match{% endblock %}
 
 {% block content %}
+<style>
+    .predict-wrap {
+        max-width: 460px;
+        margin: 0 auto;
+    }
 
-<h1>Predict Match</h1>
-{% if messages %}
-    {% for message in messages %}
-        <li>{{ message }}</li>
-    {% endfor %}
-{% endif %}
+    .back-link {
+        display: inline-block;
+        margin-bottom: 18px;
+        color: #007bff;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
 
-<form action = "{% url 'predictions:predict_match' match.id %}" method="post">
-    <h3>{{ match.match_date }}: {{ match.home_team }} vs {{ match.away_team }}</h3>
-    {% csrf_token %}
-    {{ form }}
-    <button type="submit">Submit Prediction</button>
-</form>
+    .back-link:hover {
+        text-decoration: underline;
+    }
 
+    .page-header {
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    .messages {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 18px;
+    }
+
+    .messages li {
+        background-color: #fdecea;
+        color: #d9534f;
+        font-weight: 600;
+        font-size: 0.9rem;
+        border: 1px solid #f5c2c0;
+        border-radius: 8px;
+        padding: 10px 14px;
+        margin-bottom: 8px;
+    }
+
+    .predict-card {
+        background-color: white;
+        border: 1px solid #e2e2e2;
+        border-radius: 12px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        padding: 28px 32px;
+    }
+
+    .match-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 22px;
+    }
+
+    .league-badge {
+        background-color: #333;
+        color: white;
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 4px 10px;
+        border-radius: 999px;
+    }
+
+    .match-day {
+        color: #777;
+        font-size: 0.85rem;
+    }
+
+    .scoreboard {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+        margin: 10px 0 26px;
+        text-align: center;
+    }
+
+    .team-name {
+        flex: 1 1 120px;
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: #222;
+    }
+
+    .score-inputs {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        order: 3;
+        flex-basis: 100%;
+        justify-content: center;
+    }
+
+    .score-inputs input {
+        width: 56px;
+        height: 56px;
+        font-size: 1.6rem;
+        font-weight: 700;
+        text-align: center;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        transition: border-color 0.15s;
+    }
+
+    .score-inputs input:focus {
+        outline: none;
+        border-color: #007bff;
+    }
+
+    .score-inputs .dash {
+        font-size: 1.4rem;
+        color: #999;
+        font-weight: 600;
+    }
+
+    .field-errors {
+        color: #d9534f;
+        font-size: 0.8rem;
+        text-align: center;
+        margin-top: -14px;
+        margin-bottom: 18px;
+    }
+
+    .submit-btn {
+        display: block;
+        width: 100%;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 12px;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background-color 0.15s;
+    }
+
+    .submit-btn:hover {
+        background-color: #0062cc;
+    }
+</style>
+
+<div class="predict-wrap">
+    <a class="back-link" href="{% url 'predictions:upcoming_matches' %}">&larr; Back to upcoming matches</a>
+    <h1 class="page-header">Predict Match</h1>
+
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <div class="predict-card">
+        <div class="match-meta">
+            <span class="league-badge">{{ match.league|default:"Match" }}</span>
+            <span class="match-day">{{ match.match_date|date:"l, j F Y" }}</span>
+        </div>
+
+        <form action="{% url 'predictions:predict_match' match.id %}" method="post">
+            {% csrf_token %}
+            <div class="scoreboard">
+                <span class="team-name">{{ match.home_team }}</span>
+                <div class="score-inputs">
+                    {{ form.predicted_home_score }}
+                    <span class="dash">&ndash;</span>
+                    {{ form.predicted_away_score }}
+                </div>
+                <span class="team-name">{{ match.away_team }}</span>
+            </div>
+
+            {% if form.predicted_home_score.errors or form.predicted_away_score.errors or form.non_field_errors %}
+                <div class="field-errors">
+                    {{ form.predicted_home_score.errors }}
+                    {{ form.predicted_away_score.errors }}
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <button type="submit" class="submit-btn">Submit Prediction</button>
+        </form>
+    </div>
+</div>
 {% endblock %}
