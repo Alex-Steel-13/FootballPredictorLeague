@@ -60,9 +60,20 @@ def upcoming_matches(request):
             match_dict[week_start].append(match)
         else:
             match_dict[week_start] = [match]
-    
-    
-    return render(request, 'predictions/upcoming_matches.html', {'matches': sorted(match_dict.items())})
+
+    # Build each match week as {start, end, matches}, with matches sorted by
+    # league then kickoff date - the template's {% regroup %} by league only
+    # groups correctly if the list is already sorted by that same key.
+    weeks = []
+    for week_start, week_matches in sorted(match_dict.items()):
+        week_matches.sort(key=lambda m: (m.league, m.match_date, m.home_team))
+        weeks.append({
+            "start": week_start,
+            "end": week_start + timedelta(days=3),
+            "matches": week_matches,
+        })
+
+    return render(request, 'predictions/upcoming_matches.html', {'weeks': weeks})
 
 def get_match_week_start(d):
     """Returns the Friday of the week the date falls in (Friday–Monday window)."""

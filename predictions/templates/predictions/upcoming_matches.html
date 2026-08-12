@@ -1,50 +1,160 @@
-<!DOCTYPE html>
 {% extends "base.html" %}
 
 {% block title %}Upcoming Matches{% endblock %}
 
 {% block content %}
-<html>
-<head>
-    <title>Upcoming Matches</title>
-</head>
-<body>
-    <h1>Upcoming Matches</h1>
+<style>
+    .page-header {
+        color: #333;
+        margin-bottom: 4px;
+    }
 
-    {% for week_start, week_matches in matches %}
-        <h2>Match Week Starting: {{ week_start }}</h2>
+    .page-sub {
+        color: #666;
+        margin-bottom: 28px;
+    }
 
-        {% regroup week_matches by league as league_groups %}
+    .week {
+        margin-bottom: 36px;
+    }
 
-        {% if league_groups %}
-            {% for league in league_groups %}
-                <h3>{{ league.grouper }}</h3>
-                <ul>
+    .week-header {
+        display: inline-block;
+        background-color: #333;
+        color: white;
+        font-size: 0.95rem;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        padding: 8px 16px;
+        border-radius: 999px;
+        margin-bottom: 16px;
+    }
+
+    .league-group {
+        margin-top: 18px;
+    }
+
+    .league-name {
+        display: flex;
+        align-items: center;
+        color: #444;
+        font-size: 1rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-bottom: 10px;
+    }
+
+    .league-name::before {
+        content: "";
+        width: 4px;
+        height: 16px;
+        background-color: #007bff;
+        border-radius: 2px;
+        margin-right: 8px;
+    }
+
+    .match-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 14px;
+    }
+
+    .match-card {
+        display: block;
+        background-color: white;
+        border: 1px solid #e2e2e2;
+        border-radius: 10px;
+        padding: 14px 18px;
+        text-decoration: none;
+        color: inherit;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+    }
+
+    .match-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
+        border-color: #007bff;
+    }
+
+    .match-day {
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #007bff;
+    }
+
+    .match-teams {
+        font-size: 1.08rem;
+        font-weight: 700;
+        color: #222;
+        margin: 6px 0 4px;
+        line-height: 1.35;
+    }
+
+    .match-teams .vs {
+        font-weight: 400;
+        color: #999;
+        font-size: 0.85rem;
+        margin: 0 4px;
+    }
+
+    .match-date {
+        font-size: 0.82rem;
+        color: #777;
+        margin-bottom: 8px;
+    }
+
+    .predict-cta {
+        display: inline-block;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #007bff;
+    }
+
+    .match-card:hover .predict-cta {
+        text-decoration: underline;
+    }
+
+    .empty-state {
+        background-color: white;
+        border: 1px dashed #ccc;
+        border-radius: 10px;
+        padding: 30px;
+        text-align: center;
+        color: #777;
+    }
+</style>
+
+<h1 class="page-header">Upcoming Matches</h1>
+<p class="page-sub">Choose your two predictions for each match week below.</p>
+
+{% for week in weeks %}
+    <section class="week">
+        <h2 class="week-header">{{ week.start|date:"D j M" }} – {{ week.end|date:"D j M Y" }}</h2>
+
+        {% regroup week.matches by league as league_groups %}
+        {% for league in league_groups %}
+            <div class="league-group">
+                <h3 class="league-name">{{ league.grouper|default:"Other" }}</h3>
+                <div class="match-grid">
                     {% for match in league.list %}
-                        <li>
-                            <a href="{% url 'predictions:predict_match' match.id %}">
-                                {{ match.match_date }}: {{ match.home_team }} vs {{ match.away_team }}
-                            </a>
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% endfor %}
-        {% else %}
-            <p>No grouped matches found, but there are ungrouped matches:</p>
-            <ul>
-                {% for match in week_matches %}
-                    <li>
-                        <a href="{% url 'predictions:predict_match' match.id %}">
-                            {{ match.match_date }}: {{ match.home_team }} vs {{ match.away_team }}
+                        <a class="match-card" href="{% url 'predictions:predict_match' match.id %}">
+                            <div class="match-day">{{ match.match_date|date:"l" }}</div>
+                            <div class="match-teams">{{ match.home_team }}<span class="vs">vs</span>{{ match.away_team }}</div>
+                            <div class="match-date">{{ match.match_date|date:"j F Y" }}</div>
+                            <span class="predict-cta">Make a prediction &rarr;</span>
                         </a>
-                    </li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-
-    {% empty %}
-        <p>No upcoming matches.</p>
-    {% endfor %}
-</body>
-</html>
-{% endblock %}}
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+    </section>
+{% empty %}
+    <div class="empty-state">
+        <p>No upcoming matches to predict right now — check back soon!</p>
+    </div>
+{% endfor %}
+{% endblock %}
