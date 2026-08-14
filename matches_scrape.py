@@ -113,14 +113,15 @@ def is_weekend_or_monday(date):
     return day_of_week in [0, 4, 5, 6]
 
 urls = {
-    "Premier_League": "https://www.footballwebpages.co.uk/premier-league/fixtures-results",
+    "Premier League": "https://www.footballwebpages.co.uk/premier-league/fixtures-results",
     "Championship": "https://www.footballwebpages.co.uk/championship/fixtures-results",
-    "League_1": "https://www.footballwebpages.co.uk/league-one/fixtures-results",
-    "League_2": "https://www.footballwebpages.co.uk/league-two/fixtures-results",
-    "Scottish_Premier_League": "https://www.footballwebpages.co.uk/scottish-premiership/fixtures-results",
-    "Scottish_Championship": "https://www.footballwebpages.co.uk/scottish-championship/fixtures-results",
-    "Scottish_League_1": "https://www.footballwebpages.co.uk/scottish-league-one/fixtures-results",
-    "Scottish_League_2": "https://www.footballwebpages.co.uk/scottish-league-two/fixtures-results"
+    "League 1": "https://www.footballwebpages.co.uk/league-one/fixtures-results",
+    "League 2": "https://www.footballwebpages.co.uk/league-two/fixtures-results",
+    "National League": "https://www.footballwebpages.co.uk/national-league/fixtures-results",
+    "Scottish Premier_League": "https://www.footballwebpages.co.uk/scottish-premiership/fixtures-results",
+    "Scottish Championship": "https://www.footballwebpages.co.uk/scottish-championship/fixtures-results",
+    "Scottish League_1": "https://www.footballwebpages.co.uk/scottish-league-one/fixtures-results",
+    "Scottish League_2": "https://www.footballwebpages.co.uk/scottish-league-two/fixtures-results"
     }
 
 
@@ -136,4 +137,4 @@ for key,value in urls.items():
 df = pd.DataFrame(data)
 
 os.makedirs('scraped_matches', exist_ok=True)
-df.to_csv('scraped_matches/matches_may.csv', index=False)
+df.to_csv('scraped_matches/matches_aug.csv', index=False)
