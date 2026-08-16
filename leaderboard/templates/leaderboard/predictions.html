@@ -24,8 +24,14 @@
     h1 {
       text-align: center;
     }
-    .correct_prediction {
+    .perfect_prediction {
         background-color: #B8860B;
+    }
+    .correct_result {
+        background-color: #00ff00;
+    }
+    .wrong_result {
+        background-color: #ff0400;
     }
   </style>
 </head>
@@ -51,7 +57,7 @@
         <td>
           {{ item.prediction.match.home_team }} vs {{ item.prediction.match.away_team }}
         </td>
-        <td class="{% if item.prediction.predicted_home_score == item.prediction.match.home_score and item.prediction.predicted_away_score == item.prediction.match.away_score %}correct_prediction{% endif %}">
+        <td class="{% if item.result_class %}{{ item.result_class }}{% endif %}">
           {{ item.prediction.predicted_home_score }} - {{ item.prediction.predicted_away_score }}
         </td>
         <td>

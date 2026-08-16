@@ -258,6 +258,36 @@ def profile(request, username):
     })
 
 
+def _match_outcome(home_score, away_score):
+    if home_score > away_score:
+        return "home"
+    if home_score == away_score:
+        return "draw"
+    return "away"
+
+
+def prediction_result_class(prediction):
+    """CSS class describing how a scored prediction turned out.
+
+    None while the match hasn't been played yet. Compares scores directly
+    rather than going via the stored `points` value, so it can't be thrown
+    off by stale points (see the perfect_predictions leaderboard bug).
+    """
+    match = prediction.match
+    if not match.is_played:
+        return None
+
+    if (prediction.predicted_home_score == match.home_score
+            and prediction.predicted_away_score == match.away_score):
+        return "perfect_prediction"
+
+    predicted_outcome = _match_outcome(
+        prediction.predicted_home_score, prediction.predicted_away_score
+    )
+    actual_outcome = _match_outcome(match.home_score, match.away_score)
+    return "correct_result" if predicted_outcome == actual_outcome else "wrong_result"
+
+
 # ---------------------------------------------------------------------------
 # This week's predictions, ranked by the user's leaderboard position
 # ---------------------------------------------------------------------------
@@ -279,7 +309,11 @@ def predictions(request):
     )
 
     rows = [
-        {"prediction": p, "rank": user_rankings.get(p.user_id, len(leaderboard) + 1)}
+        {
+            "prediction": p,
+            "rank": user_rankings.get(p.user_id, len(leaderboard) + 1),
+            "result_class": prediction_result_class(p),
+        }
         for p in this_week_preds
     ]
     rows.sort(key=lambda item: item["rank"])
