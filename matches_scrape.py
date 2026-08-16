@@ -118,10 +118,10 @@ urls = {
     "League 1": "https://www.footballwebpages.co.uk/league-one/fixtures-results",
     "League 2": "https://www.footballwebpages.co.uk/league-two/fixtures-results",
     "National League": "https://www.footballwebpages.co.uk/national-league/fixtures-results",
-    "Scottish Premier_League": "https://www.footballwebpages.co.uk/scottish-premiership/fixtures-results",
+    "Scottish Premier League": "https://www.footballwebpages.co.uk/scottish-premiership/fixtures-results",
     "Scottish Championship": "https://www.footballwebpages.co.uk/scottish-championship/fixtures-results",
-    "Scottish League_1": "https://www.footballwebpages.co.uk/scottish-league-one/fixtures-results",
-    "Scottish League_2": "https://www.footballwebpages.co.uk/scottish-league-two/fixtures-results"
+    "Scottish League 1": "https://www.footballwebpages.co.uk/scottish-league-one/fixtures-results",
+    "Scottish League 2": "https://www.footballwebpages.co.uk/scottish-league-two/fixtures-results"
     }
 
 
