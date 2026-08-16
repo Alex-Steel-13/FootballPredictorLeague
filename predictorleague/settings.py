@@ -24,7 +24,7 @@ config = Config(RepositoryEnv(str(env_path)))
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-u=_)#aprhi$n1#d$a3)1u4n3vre__tzz&_0n^x_5*l^yge!r$%'
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -84,11 +84,15 @@ WSGI_APPLICATION = 'predictorleague.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'AlexSteel$default',
-        'USER': 'AlexSteel',
-        'PASSWORD': 'Clara12345',
-        'HOST': 'AlexSteel.mysql.pythonanywhere-services.com',
-        'PORT': '3306',
+        'NAME': config('DB_NAME'),
+        'USER': config('DB_USER'),
+        'PASSWORD': config('DB_PASSWORD'),
+        # HOST/PORT come from .env by default, but scrape_and_upload.py sets
+        # the DB_HOST/DB_PORT environment variables before Django loads to
+        # point this at 127.0.0.1 through its SSH tunnel instead - config()
+        # always checks os.environ before falling back to .env.
+        'HOST': config('DB_HOST'),
+        'PORT': config('DB_PORT'),
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
         },

@@ -7,3 +7,5 @@ html5lib
 whitenoise>=6.6.0
 mysqlclient
 pymysql
+sshtunnel
+python-decouple

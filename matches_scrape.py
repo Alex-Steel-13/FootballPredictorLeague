@@ -125,16 +125,26 @@ urls = {
     }
 
 
+def scrape_all_leagues():
+    """Scrape every league in `urls` and return the combined fixtures as a DataFrame.
 
-data = []
-for key,value in urls.items():
-    result = scrape_data(value, key)
-    if isinstance(result, list):
-        data.extend(result)  # Add each item from the list individually
-    else:
-        data.append(result)  # Just a single dictionary
+    Pulled out into a function (rather than running at import time) so other
+    scripts - e.g. scrape_and_upload.py - can call this directly without
+    triggering a second scrape or a CSV write as a side effect of importing
+    this module.
+    """
+    data = []
+    for key, value in urls.items():
+        result = scrape_data(value, key)
+        if isinstance(result, list):
+            data.extend(result)  # Add each item from the list individually
+        else:
+            data.append(result)  # Just a single dictionary
 
-df = pd.DataFrame(data)
+    return pd.DataFrame(data)
 
-os.makedirs('scraped_matches', exist_ok=True)
-df.to_csv('scraped_matches/matches_aug.csv', index=False)
+
+if __name__ == "__main__":
+    df = scrape_all_leagues()
+    os.makedirs('scraped_matches', exist_ok=True)
+    df.to_csv('scraped_matches/matches_aug.csv', index=False)
