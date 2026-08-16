@@ -2,7 +2,7 @@ import datetime
 
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth import get_user_model
-from django.db.models import Count, Sum, Q
+from django.db.models import Count, Sum, Q, F
 from django.utils import timezone
 
 from .models import Prediction
@@ -113,7 +113,13 @@ def build_leaderboard(today=None):
             points_from_previous_weeks=Sum(
                 "points", filter=Q(match__match_date__lt=week_start)
             ),
-            perfect_predictions=Count("id", filter=Q(points__gte=100)),
+            perfect_predictions=Count(
+                "id",
+                filter=Q(
+                    predicted_home_score=F("match__home_score"),
+                    predicted_away_score=F("match__away_score"),
+                ),
+            ),
             correct_winner=Count("id", filter=Q(points__gt=0)),
         )
     )
