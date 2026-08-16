@@ -11,6 +11,35 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 
 
+# Display order for leagues within a match week, top to bottom.
+LEAGUE_DISPLAY_ORDER = [
+    "premier league",
+    "championship",
+    "league 1",
+    "league 2",
+    "national league",
+    "scottish premier league",
+    "scottish championship",
+    "scottish league 1",
+    "scottish league 2",
+]
+
+
+def _league_sort_key(league_name):
+    """Map a Match.league value to its position in LEAGUE_DISPLAY_ORDER.
+
+    Different data sources have saved league names with different
+    formatting (e.g. "Premier_League" vs "Premier League"), so this
+    normalises underscores/spacing/case before looking it up. Anything
+    not in the list sorts after all known leagues, alphabetically.
+    """
+    normalised = " ".join((league_name or "").replace("_", " ").split()).lower()
+    try:
+        return (0, LEAGUE_DISPLAY_ORDER.index(normalised))
+    except ValueError:
+        return (1, normalised)
+
+
 # Create your views here.
 @login_required(login_url="/users/login/")
 def upcoming_matches(request):
@@ -62,11 +91,14 @@ def upcoming_matches(request):
             match_dict[week_start] = [match]
 
     # Build each match week as {start, end, matches}, with matches sorted by
-    # league then kickoff date - the template's {% regroup %} by league only
-    # groups correctly if the list is already sorted by that same key.
+    # league (in LEAGUE_DISPLAY_ORDER) then kickoff date - the template's
+    # {% regroup %} by league only groups correctly if the list is already
+    # sorted by that same key.
     weeks = []
     for week_start, week_matches in sorted(match_dict.items()):
-        week_matches.sort(key=lambda m: (m.league, m.match_date, m.home_team))
+        week_matches.sort(
+            key=lambda m: (_league_sort_key(m.league), m.match_date, m.home_team)
+        )
         weeks.append({
             "start": week_start,
             "end": week_start + timedelta(days=3),
