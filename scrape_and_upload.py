@@ -47,6 +47,17 @@ def main():
         "(used only to open the SSH tunnel, never stored): "
     )
 
+    import paramiko
+
+    if not hasattr(paramiko, "DSSKey"):
+        # sshtunnel 0.4.0 (its latest release - the project is effectively
+        # unmaintained) unconditionally references paramiko.DSSKey while
+        # building its auth key-type table. Current paramiko dropped DSA key
+        # support entirely (deprecated/insecure). We authenticate with a
+        # password, not a key, so this dummy alias is never actually
+        # exercised - it just stops sshtunnel's import-time AttributeError.
+        paramiko.DSSKey = paramiko.RSAKey
+
     import sshtunnel
 
     print(f"Opening SSH tunnel to {PA_SSH_HOST} ...")
