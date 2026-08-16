@@ -1,0 +1,11 @@
+{% extends "admin/change_list.html" %}
+{% load i18n admin_urls %}
+
+{% block object-tools-items %}
+    <li>
+        <a href="{% url 'admin:predictions_match_recalculate_scores' %}" class="button">
+            {% translate "Recalculate All Scores" %}
+        </a>
+    </li>
+    {{ block.super }}
+{% endblock %}
