@@ -25,19 +25,31 @@ LEAGUE_DISPLAY_ORDER = [
 ]
 
 
+def _normalise_league(league_name):
+    """Normalise a Match.league value for comparison.
+
+    Different data sources have saved league names with different
+    formatting (e.g. "Premier_League" vs "Premier League" vs
+    "National_League" vs "National League"), so this collapses
+    underscores/spacing/case before any comparison is made against it.
+    """
+    return " ".join((league_name or "").replace("_", " ").split()).lower()
+
+
 def _league_sort_key(league_name):
     """Map a Match.league value to its position in LEAGUE_DISPLAY_ORDER.
 
-    Different data sources have saved league names with different
-    formatting (e.g. "Premier_League" vs "Premier League"), so this
-    normalises underscores/spacing/case before looking it up. Anything
-    not in the list sorts after all known leagues, alphabetically.
+    Anything not in the list sorts after all known leagues, alphabetically.
     """
-    normalised = " ".join((league_name or "").replace("_", " ").split()).lower()
+    normalised = _normalise_league(league_name)
     try:
         return (0, LEAGUE_DISPLAY_ORDER.index(normalised))
     except ValueError:
         return (1, normalised)
+
+
+def _is_national_league(match):
+    return _normalise_league(match.league) == "national league"
 
 
 # Create your views here.
@@ -74,16 +86,30 @@ def upcoming_matches(request):
         if count <= 1:
             upcoming_matches_filtered_2.append(match)
 
+    #filtering out other National League games if they've already predicted one that match week
+    upcoming_matches_filtered_3 = []
+    for match in upcoming_matches_filtered_2:
+        if _is_national_league(match):
+            week_start = get_match_week_start(match.match_date)
+            already_predicted_national_league = any(
+                _is_national_league(prediction.match)
+                and get_match_week_start(prediction.match.match_date) == week_start
+                for prediction in user_predictions
+            )
+            if already_predicted_national_league:
+                continue
+        upcoming_matches_filtered_3.append(match)
+
     #to lock the predictions on saturday, will remove the rest of that matchweek
     if today.weekday() in (5, 6, 0):  # Sat=5, Sun=6, Mon=0
         locked_week_start = get_match_week_start(today)
-        upcoming_matches_filtered_2 = [
-            m for m in upcoming_matches_filtered_2
+        upcoming_matches_filtered_3 = [
+            m for m in upcoming_matches_filtered_3
             if get_match_week_start(m.match_date) != locked_week_start
-        ]            
+        ]
 
     #goes through each match, works out the friday of the matchweek its in, adds it to the dict
-    for match in upcoming_matches_filtered_2:
+    for match in upcoming_matches_filtered_3:
         week_start = get_match_week_start(match.match_date)
         if week_start in match_dict:
             match_dict[week_start].append(match)
