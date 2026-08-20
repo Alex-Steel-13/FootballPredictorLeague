@@ -1,70 +1,160 @@
+{% extends "base.html" %}
 
-
-{% block title %}Predictions by {{ profile_user.username }}{% endblock %}
+{% block title %}{{ profile_user.username }}'s Stats{% endblock %}
 
 {% block content %}
 <style>
-    /* Basic styling for the content area */
     .content-container {
         font-family: Arial, sans-serif;
-        background-color: white;
-        padding: 20px;
-        border-radius: 8px;
         max-width: 900px;
         margin: 20px auto;
     }
 
-    h1 {
-        color: #333;
-        border-bottom: 2px solid #ccc;
-        padding-bottom: 10px;
+    .profile-header {
+        background-color: #333;
+        color: white;
+        border-radius: 8px;
+        padding: 18px 24px;
         margin-bottom: 20px;
     }
 
-    /* Table styling */
-    .predictions-table {
+    .profile-header h1 {
+        margin: 0 0 4px 0;
+        font-size: 1.6em;
+    }
+
+    .profile-header p {
+        margin: 0;
+        color: #ddd;
+    }
+
+    .profile-header .rank-out-of {
+        color: #FFD700;
+        font-weight: bold;
+    }
+
+    /* Shared table chrome */
+    .stats-table, .predictions-table {
         width: 100%;
-        border-collapse: collapse; /* Removes space between borders */
-        margin-top: 20px;
+        border-collapse: collapse;
+        background-color: white;
         box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        border-radius: 8px;
+        overflow: hidden;
+        margin-bottom: 28px;
     }
 
-    .predictions-table thead {
-        background-color: #007bff;
-        color: white;
-    }
-
+    .stats-table th, .stats-table td,
     .predictions-table th, .predictions-table td {
-        padding: 12px 15px;
+        padding: 10px 15px;
         text-align: left;
         border-bottom: 1px solid #ddd;
     }
 
-    /* Style for table headers */
-    .predictions-table th {
+    .stats-table thead th, .predictions-table thead th {
+        background-color: #333;
+        color: white;
         font-weight: bold;
     }
 
-    /* Alternating row colors for readability */
-    .predictions-table tbody tr:nth-child(even) {
+    .stats-table td:nth-child(2),
+    .stats-table td:nth-child(3),
+    .stats-table td:nth-child(4) {
+        text-align: center;
+    }
+
+    /* Section header rows */
+    .stats-table .section-title td {
         background-color: #f2f2f2;
+        font-weight: bold;
+        border-top: 2px solid #ccc;
     }
 
-    /* Hover effect for rows */
+    .stats-table .section-note td {
+        color: #666;
+        font-size: 0.85em;
+        font-style: italic;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .stats-table tbody tr:not(.section-title):not(.section-note):hover {
+        background-color: #f7f7f7;
+    }
+
+    .stat-pct {
+        color: #555;
+    }
+
+    .rank-badge {
+        display: inline-block;
+        min-width: 2.6em;
+        padding: 3px 10px;
+        border-radius: 12px;
+        font-weight: bold;
+        background-color: #eee;
+        color: #333;
+    }
+
+    .rank-badge .of-total {
+        font-weight: normal;
+        color: inherit;
+        opacity: 0.75;
+    }
+
+    .rank-first .rank-badge {
+        background-color: #B8860B;
+        color: white;
+    }
+
+    /* Predictions table */
+    h2 {
+        color: #333;
+        border-bottom: 2px solid #ccc;
+        padding-bottom: 8px;
+        margin-bottom: 14px;
+    }
+
+    .predictions-table tbody tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
     .predictions-table tbody tr:hover {
-        background-color: #e9ecef;
+        background-color: #f0f0f0;
     }
 
-    /* Centering the predicted score */
     .prediction-score {
         text-align: center;
         font-weight: bold;
         font-size: 1.1em;
     }
 
-    /* Message for when there are no predictions */
+    .predictions-table tr.perfect_prediction .prediction-score {
+        color: #8a6d00;
+        background-color: #FFF3C4;
+    }
+
+    .predictions-table tr.correct_result .prediction-score {
+        color: #1b7a1b;
+        background-color: #e4f7e4;
+    }
+
+    .predictions-table tr.wrong_result .prediction-score {
+        color: #a30f0f;
+        background-color: #fbe4e4;
+    }
+
     .no-predictions {
         margin-top: 20px;
+        padding: 15px;
+        background-color: #f2f2f2;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        color: #555;
+        text-align: center;
+    }
+
+    .no-stats {
+        margin-bottom: 28px;
         padding: 15px;
         background-color: #f2f2f2;
         border: 1px solid #ddd;
@@ -75,7 +165,53 @@
 </style>
 
 <div class="content-container">
-    <h1>All Predictions by {{ profile_user.username }}</h1>
+    <div class="profile-header">
+        <h1>{{ profile_user.username }}</h1>
+        {% if stats_table %}
+            <p>Player stats, ranked against <span class="rank-out-of">{{ total_participants }}</span> active predictors.</p>
+        {% else %}
+            <p>This account isn't part of the active leaderboard, so it has no ranked stats.</p>
+        {% endif %}
+    </div>
+
+    {% if stats_table %}
+    <table class="stats-table">
+        <thead>
+            <tr>
+                <th>Stat</th>
+                <th>Count</th>
+                <th>%</th>
+                <th>Rank</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for section in stats_table %}
+                <tr class="section-title">
+                    <td colspan="4">{{ section.title }}</td>
+                </tr>
+                {% if section.note %}
+                <tr class="section-note">
+                    <td colspan="4">{{ section.note }}</td>
+                </tr>
+                {% endif %}
+                {% for row in section.rows %}
+                <tr class="{% if row.rank == 1 %}rank-first{% endif %}">
+                    <td>{{ row.label }}</td>
+                    <td>{{ row.value }}</td>
+                    <td class="stat-pct">{% if row.pct is not None %}{{ row.pct }}%{% else %}—{% endif %}</td>
+                    <td>
+                        <span class="rank-badge">#{{ row.rank }} <span class="of-total">/ {{ total_participants }}</span></span>
+                    </td>
+                </tr>
+                {% endfor %}
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="no-stats">No stats to show for {{ profile_user.username }} yet.</p>
+    {% endif %}
+
+    <h2>All Predictions by {{ profile_user.username }}</h2>
 
     <table class="predictions-table">
         <thead>
@@ -87,9 +223,9 @@
         </thead>
         <tbody>
             {% for prediction in predictions %}
-                <tr>
+                <tr class="{% if prediction.result_class %}{{ prediction.result_class }}{% endif %}">
                     <td>
-                        {{ prediction.match.home_team.name }} vs {{ prediction.match.away_team.name }}
+                        {{ prediction.match.home_team }} vs {{ prediction.match.away_team }}
                     </td>
                     <td>
                         {{ prediction.match.match_date|date:"D d M Y" }}
@@ -109,4 +245,3 @@
     </table>
 </div>
 {% endblock %}
-

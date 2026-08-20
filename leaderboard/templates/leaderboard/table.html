@@ -59,6 +59,14 @@
             background-color: #ffffff;
             color: black
         }
+        .player-link {
+            color: inherit;
+            text-decoration: underline dotted;
+            font-weight: bold;
+        }
+        .player-link:hover {
+            color: #B8860B;
+        }
 
     </style>
 </head>
@@ -85,7 +93,7 @@
         {% for entry in leaderboard %}
         <tr class="{% if forloop.counter == 1 %}top-player{% elif forloop.counter == 2 %}second-player{% elif forloop.counter == 3 %}third-player{% elif forloop.counter == 4 %}fourth-player{% elif forloop.counter == 5 %}fifth-player{% elif forloop.last %}bottom-player{% endif %}">
             <td>{{ forloop.counter }}</td>
-            <td>{{ entry.user }}</td>
+            <td><a class="player-link" href="{% url 'leaderboard:profile' entry.user.username %}">{{ entry.user }}</a></td>
             <td>{{ entry.number_of_predictions }}</td>
             <td style="background-color: {{ entry.wb_color }};">{{ entry.points_this_week}} </td>
             <td>{{ entry.score }}</td>

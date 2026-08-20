@@ -22,7 +22,6 @@ from leaderboard import views as leaderboard_views
 urlpatterns = [
     path("", leaderboard_views.leaderboard_view, name= "home"),
     path("info/", views.info, name="info"),
-    path('leaderboard', include("leaderboard.urls")),
     path('admin/', admin.site.urls),
     path('predict/', include('predictions.urls')),
     path('users/', include('users.urls')),

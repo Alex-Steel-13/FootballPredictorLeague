@@ -234,6 +234,258 @@ def manager_of_month(request):
 
 
 # ---------------------------------------------------------------------------
+# Player stats (profile page)
+# ---------------------------------------------------------------------------
+# (metric key, ascending) - ascending=True means "lower is better" (rank 1
+# goes to the smallest value), used only for incorrect_results. Everything
+# else ranks highest-value-first.
+_STATS_RANK_METRICS = [
+    ("total_predictions", False),
+    ("perfect_predictions", False),
+    ("correct_results", False),
+    ("incorrect_results", True),
+    ("home_predictions", False),
+    ("away_predictions", False),
+    ("draw_predictions", False),
+    ("perfect_home", False),
+    ("perfect_away", False),
+    ("perfect_draw", False),
+    ("correct_home", False),
+    ("correct_away", False),
+    ("correct_draw", False),
+]
+
+
+def _rank(value, values, ascending=False):
+    """Standard competition ranking (1, 2, 2, 4, ...) of `value` within `values`."""
+    if ascending:
+        beaten = sum(1 for v in values if v < value)
+    else:
+        beaten = sum(1 for v in values if v > value)
+    return beaten + 1
+
+
+def _pct(value, denominator):
+    """Whole-number percentage, or None if there's nothing to divide by."""
+    return round(value / denominator * 100) if denominator else None
+
+
+def build_player_stats():
+    """Per-user prediction stats + each user's rank on every stat.
+
+    The ranked pool is every user with can_participate=True (whether or not
+    they've made a prediction yet), matching the leaderboard's definition of
+    "everyone". Returns (stats_by_user_id, total_participants).
+    """
+    users = (
+        User.objects.filter(can_participate=True)
+        .annotate(
+            total_predictions=Count("prediction", distinct=True),
+            played_predictions=Count(
+                "prediction",
+                filter=Q(prediction__match__home_score__isnull=False),
+                distinct=True,
+            ),
+            perfect_predictions=Count(
+                "prediction",
+                filter=Q(
+                    prediction__predicted_home_score=F("prediction__match__home_score"),
+                    prediction__predicted_away_score=F("prediction__match__away_score"),
+                ),
+                distinct=True,
+            ),
+            correct_results=Count(
+                "prediction", filter=Q(prediction__points__gt=0), distinct=True
+            ),
+            home_predictions=Count(
+                "prediction",
+                filter=Q(prediction__predicted_home_score__gt=F("prediction__predicted_away_score")),
+                distinct=True,
+            ),
+            away_predictions=Count(
+                "prediction",
+                filter=Q(prediction__predicted_home_score__lt=F("prediction__predicted_away_score")),
+                distinct=True,
+            ),
+            draw_predictions=Count(
+                "prediction",
+                filter=Q(prediction__predicted_home_score=F("prediction__predicted_away_score")),
+                distinct=True,
+            ),
+            perfect_home=Count(
+                "prediction",
+                filter=Q(
+                    prediction__predicted_home_score=F("prediction__match__home_score"),
+                    prediction__predicted_away_score=F("prediction__match__away_score"),
+                    prediction__predicted_home_score__gt=F("prediction__predicted_away_score"),
+                ),
+                distinct=True,
+            ),
+            perfect_away=Count(
+                "prediction",
+                filter=Q(
+                    prediction__predicted_home_score=F("prediction__match__home_score"),
+                    prediction__predicted_away_score=F("prediction__match__away_score"),
+                    prediction__predicted_home_score__lt=F("prediction__predicted_away_score"),
+                ),
+                distinct=True,
+            ),
+            perfect_draw=Count(
+                "prediction",
+                filter=(
+                    Q(prediction__predicted_home_score=F("prediction__match__home_score"))
+                    & Q(prediction__predicted_away_score=F("prediction__match__away_score"))
+                    & Q(prediction__predicted_home_score=F("prediction__predicted_away_score"))
+                ),
+                distinct=True,
+            ),
+            correct_home=Count(
+                "prediction",
+                filter=Q(
+                    prediction__points__gt=0,
+                    prediction__predicted_home_score__gt=F("prediction__predicted_away_score"),
+                ),
+                distinct=True,
+            ),
+            correct_away=Count(
+                "prediction",
+                filter=Q(
+                    prediction__points__gt=0,
+                    prediction__predicted_home_score__lt=F("prediction__predicted_away_score"),
+                ),
+                distinct=True,
+            ),
+            correct_draw=Count(
+                "prediction",
+                filter=Q(
+                    prediction__points__gt=0,
+                    prediction__predicted_home_score=F("prediction__predicted_away_score"),
+                ),
+                distinct=True,
+            ),
+        )
+    )
+
+    stats = {}
+    for u in users:
+        played = u.played_predictions
+        perfect = u.perfect_predictions
+        correct = u.correct_results
+        incorrect = played - correct
+        total = u.total_predictions
+
+        stats[u.id] = {
+            "username": u.username,
+            "total_predictions": total,
+            "played_predictions": played,
+            "perfect_predictions": perfect,
+            "perfect_pct": _pct(perfect, played),
+            "correct_results": correct,
+            "correct_pct": _pct(correct, played),
+            "incorrect_results": incorrect,
+            "incorrect_pct": _pct(incorrect, played),
+            "home_predictions": u.home_predictions,
+            "home_pct": _pct(u.home_predictions, total),
+            "away_predictions": u.away_predictions,
+            "away_pct": _pct(u.away_predictions, total),
+            "draw_predictions": u.draw_predictions,
+            "draw_pct": _pct(u.draw_predictions, total),
+            "perfect_home": u.perfect_home,
+            "perfect_home_pct": _pct(u.perfect_home, perfect),
+            "perfect_away": u.perfect_away,
+            "perfect_away_pct": _pct(u.perfect_away, perfect),
+            "perfect_draw": u.perfect_draw,
+            "perfect_draw_pct": _pct(u.perfect_draw, perfect),
+            "correct_home": u.correct_home,
+            "correct_home_pct": _pct(u.correct_home, correct),
+            "correct_away": u.correct_away,
+            "correct_away_pct": _pct(u.correct_away, correct),
+            "correct_draw": u.correct_draw,
+            "correct_draw_pct": _pct(u.correct_draw, correct),
+        }
+
+    total_participants = len(stats)
+    for key, ascending in _STATS_RANK_METRICS:
+        values = [row[key] for row in stats.values()]
+        for row in stats.values():
+            row[f"{key}_rank"] = _rank(row[key], values, ascending)
+
+    return stats, total_participants
+
+
+def _stats_table(stats, username):
+    """Turn the flat stats dict into the grouped sections the template renders.
+
+    Each row carries exactly what the table needs: a label, the raw value,
+    an optional percentage (None renders as "—"), and this user's rank.
+    """
+    played = stats["played_predictions"]
+    total = stats["total_predictions"]
+    perfect = stats["perfect_predictions"]
+    correct = stats["correct_results"]
+
+    def row(label, value_key, pct_key=None):
+        return {
+            "label": label,
+            "value": stats[value_key],
+            "pct": stats.get(pct_key) if pct_key else None,
+            "rank": stats[f"{value_key}_rank"],
+        }
+
+    return [
+        {
+            "title": "Overview",
+            "note": f"Every prediction {username} has ever submitted "
+                    f"({played} of them played so far).",
+            "rows": [row("Total Predictions", "total_predictions")],
+        },
+        {
+            "title": "Perfect Predictions",
+            "note": f"Exact scoreline correct, as a share of {played} played predictions.",
+            "rows": [row("Perfect Predictions", "perfect_predictions", "perfect_pct")],
+        },
+        {
+            "title": "Correct Results",
+            "note": f"Correct winner (or correctly-called draw), as a share of "
+                    f"{played} played predictions.",
+            "rows": [row("Correct Results", "correct_results", "correct_pct")],
+        },
+        {
+            "title": "Incorrect Results",
+            "note": "Wrong winner/draw call. Rank 1 = fewest incorrect results.",
+            "rows": [row("Incorrect Results", "incorrect_results", "incorrect_pct")],
+        },
+        {
+            "title": "Prediction Split",
+            "note": f"What {username} tends to predict, as a share of all {total} predictions.",
+            "rows": [
+                row("Home Win Predictions", "home_predictions", "home_pct"),
+                row("Away Win Predictions", "away_predictions", "away_pct"),
+                row("Draw Predictions", "draw_predictions", "draw_pct"),
+            ],
+        },
+        {
+            "title": "Perfect Prediction Split",
+            "note": f"Share of {username}'s {perfect} perfect predictions.",
+            "rows": [
+                row("Perfect Home Wins", "perfect_home", "perfect_home_pct"),
+                row("Perfect Away Wins", "perfect_away", "perfect_away_pct"),
+                row("Perfect Draws", "perfect_draw", "perfect_draw_pct"),
+            ],
+        },
+        {
+            "title": "Correct Result Split",
+            "note": f"Share of {username}'s {correct} correct results.",
+            "rows": [
+                row("Correct Home Wins", "correct_home", "correct_home_pct"),
+                row("Correct Away Wins", "correct_away", "correct_away_pct"),
+                row("Correct Draws", "correct_draw", "correct_draw_pct"),
+            ],
+        },
+    ]
+
+
+# ---------------------------------------------------------------------------
 # Profile
 # ---------------------------------------------------------------------------
 def profile(request, username):
@@ -251,10 +503,18 @@ def profile(request, username):
         p for p in predictions
         if get_match_week_start(p.match.match_date) != this_week
     ]
+    for p in predictions_final:
+        p.result_class = prediction_result_class(p)
+
+    stats_by_user, total_participants = build_player_stats()
+    stats = stats_by_user.get(profile_user.id)
+    stats_table = _stats_table(stats, profile_user.username) if stats else None
 
     return render(request, "leaderboard/profile.html", {
         "profile_user": profile_user,
         "predictions": predictions_final,
+        "stats_table": stats_table,
+        "total_participants": total_participants,
     })
 
 
