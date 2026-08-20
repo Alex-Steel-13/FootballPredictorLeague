@@ -485,12 +485,38 @@ def _stats_table(stats, username):
     ]
 
 
+def _match_week_reveal_date(match_date):
+    """The date a match's prediction becomes visible to other users.
+
+    Same Saturday-00:00 threshold used to lock predictions from editing
+    (see your_predictions' lock_date) and the one "everyone's predictions
+    this week" already relies on implicitly via its match-week window: once
+    a match week's predictions are locked, nobody can change theirs after
+    peeking at someone else's, so it's safe to reveal them.
+    """
+    return get_match_week_start(match_date) + datetime.timedelta(days=1)
+
+
+def _prediction_is_public(prediction, today=None):
+    """Whether a prediction should be visible to someone other than its owner.
+
+    Two independent gates, both must pass:
+    - the match has actually been played (has a recorded score) - otherwise
+      there's nothing real to show yet, regardless of date.
+    - today is on/after that match week's reveal date - the same anti-copying
+      cutoff "everyone's predictions this week" uses.
+    """
+    today = today or timezone.now().date()
+    match = prediction.match
+    if match.home_score is None or match.away_score is None:
+        return False
+    return today >= _match_week_reveal_date(match.match_date)
+
+
 # ---------------------------------------------------------------------------
 # Profile
 # ---------------------------------------------------------------------------
 def profile(request, username):
-    today = timezone.now()
-    this_week = get_match_week_start(today)
     profile_user = get_object_or_404(User, username=username)
 
     predictions = (
@@ -499,9 +525,9 @@ def profile(request, username):
         .select_related("match")
         .order_by("-match__match_date")
     )
+    today_date = timezone.now().date()
     predictions_final = [
-        p for p in predictions
-        if get_match_week_start(p.match.match_date) != this_week
+        p for p in predictions if _prediction_is_public(p, today_date)
     ]
     for p in predictions_final:
         p.result_class = prediction_result_class(p)
