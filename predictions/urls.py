@@ -9,5 +9,6 @@ urlpatterns = [
     path("edit_prediction/<int:prediction_id>/", views.edit_prediction, name="edit_prediction"),
     path('delete_prediction/<int:prediction_id>/', views.delete_prediction, name='delete_prediction'),
     path("your_past_predictions", views.your_past_predictions, name="your_past_predictions"),
+    path("enter_scores", views.enter_scores, name="enter_scores"),
 
 ]

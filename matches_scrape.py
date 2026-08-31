@@ -62,11 +62,9 @@ def number_to_month(number):
 
 
 def scrape_data(url, league):
-    month_int = datetime.datetime.now().month + 0
-    if month_int <= 10:
-        month = number_to_month(month_int)
-    elif month_int == 11:
-        month = number_to_month(1)
+    month_int = datetime.datetime.now().month
+    if month_int <= 11:
+        month = number_to_month(month_int+1)
     elif month_int == 12:
         month = number_to_month(1)
     print(month)

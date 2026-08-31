@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block title %}Enter Scores{% endblock %}
+
+{% block content %}
+<style>
+    .scores-wrap {
+        max-width: 640px;
+        margin: 0 auto;
+    }
+
+    .page-header {
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    .messages {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 18px;
+    }
+
+    .messages li {
+        background-color: #eafaea;
+        color: #2f7d32;
+        font-weight: 600;
+        font-size: 0.9rem;
+        border: 1px solid #c3e6c3;
+        border-radius: 8px;
+        padding: 10px 14px;
+        margin-bottom: 8px;
+    }
+
+    .messages li.error {
+        background-color: #fdecea;
+        color: #d9534f;
+        border-color: #f5c2c0;
+    }
+
+    .day-heading {
+        color: #333;
+        font-size: 1.05rem;
+        margin: 26px 0 10px;
+        padding-bottom: 6px;
+        border-bottom: 2px solid #ccc;
+    }
+
+    .day-heading:first-of-type {
+        margin-top: 0;
+    }
+
+    .score-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background-color: white;
+        border: 1px solid #e2e2e2;
+        border-radius: 8px;
+        padding: 12px 16px;
+        margin-bottom: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .score-row .teams {
+        flex: 1;
+        font-weight: 600;
+        color: #222;
+    }
+
+    .score-row input[type="number"] {
+        width: 50px;
+        height: 40px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        text-align: center;
+        border: 2px solid #ddd;
+        border-radius: 6px;
+    }
+
+    .score-row input[type="number"]:focus {
+        outline: none;
+        border-color: #007bff;
+    }
+
+    .dash {
+        color: #999;
+        font-weight: 600;
+    }
+
+    .save-btn {
+        display: block;
+        width: 100%;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 14px;
+        border-radius: 8px;
+        font-size: 1.05rem;
+        font-weight: 700;
+        cursor: pointer;
+        margin-top: 24px;
+    }
+
+    .save-btn:hover {
+        background-color: #0062cc;
+    }
+
+    .all-done {
+        color: #555;
+        margin-top: 10px;
+    }
+</style>
+
+<div class="scores-wrap">
+    <h1 class="page-header">Enter Scores</h1>
+
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    {% if days %}
+        <form method="post">
+            {% csrf_token %}
+            {% for day in days %}
+                <h2 class="day-heading">{{ day.date|date:"l j F" }}</h2>
+                {% for match in day.matches %}
+                    <div class="score-row">
+                        <input type="hidden" name="match_id" value="{{ match.id }}">
+                        <span class="teams">{{ match.home_team }} vs {{ match.away_team }}</span>
+                        <input type="number" min="0" step="1" name="home_score_{{ match.id }}" inputmode="numeric">
+                        <span class="dash">&ndash;</span>
+                        <input type="number" min="0" step="1" name="away_score_{{ match.id }}" inputmode="numeric">
+                    </div>
+                {% endfor %}
+            {% endfor %}
+            <button type="submit" class="save-btn">Save All Scores</button>
+        </form>
+    {% else %}
+        <p class="all-done">No matches are waiting for a score right now.</p>
+    {% endif %}
+</div>
+{% endblock %}

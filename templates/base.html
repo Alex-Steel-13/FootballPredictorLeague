@@ -74,7 +74,9 @@
                     <li><a href="{% url 'predictions:your_predictions' %}">Edit Your Predictions</a></li>
                     <li><a href="{% url 'predictions:your_past_predictions' %}">Your Past Predictions</a></li>
                     <li><a href="{% url 'leaderboard:predictions_this_week' %}">Everyone's Predictions This Week</a></li>
-                    
+                    {% if user.is_superuser %}
+                        <li><a href="{% url 'predictions:enter_scores' %}">Enter Scores</a></li>
+                    {% endif %}
                 {% endif %}
             </ul>
             <ul class="nav-right">

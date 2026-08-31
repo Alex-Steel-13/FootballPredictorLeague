@@ -3,7 +3,7 @@ from django.utils import timezone
 from django.contrib.auth.forms import UserCreationForm
 from datetime import date, timedelta
 import datetime
-from .models import Match, Prediction
+from .models import Match, Prediction, recompute_points
 from django.contrib.auth.decorators import login_required
 from . import forms
 from django.http import Http404
@@ -273,3 +273,78 @@ def delete_prediction(request, prediction_id):
             match.predicted = False
             match.save()
         return redirect('predictions:upcoming_matches')
+
+
+@login_required(login_url="/users/login/")
+def enter_scores(request):
+    """Admin-only page to quickly enter results for matches that have been
+    played but don't have a score yet.
+
+    Only shows matches that: have kicked off (match_date <= today), were
+    actually predicted by someone, don't already have a score, and aren't
+    marked as postponed (a postponed match's original date can be in the
+    past without the game having happened).
+    """
+    if not request.user.is_superuser:
+        raise Http404
+
+    today = timezone.now().date()
+
+    if request.method == "POST":
+        match_ids = request.POST.getlist("match_id")
+        updated_pks = []
+        for match_id in match_ids:
+            home_raw = request.POST.get(f"home_score_{match_id}", "").strip()
+            away_raw = request.POST.get(f"away_score_{match_id}", "").strip()
+            if home_raw == "" or away_raw == "":
+                continue  # left blank - not entered this time round
+
+            try:
+                home_score = int(home_raw)
+                away_score = int(away_raw)
+            except ValueError:
+                messages.error(request, "Scores must be whole numbers - one match was skipped.")
+                continue
+
+            if home_score < 0 or away_score < 0:
+                messages.error(request, "Scores can't be negative - one match was skipped.")
+                continue
+
+            match = Match.objects.filter(pk=match_id).first()
+            if match is None:
+                continue
+
+            match.home_score = home_score
+            match.away_score = away_score
+            match.save(update_fields=["home_score", "away_score"])
+            updated_pks.append(match.pk)
+
+        if updated_pks:
+            recompute_points(match_pks=updated_pks)
+            messages.success(
+                request,
+                f"Saved {len(updated_pks)} score{'s' if len(updated_pks) != 1 else ''}.",
+            )
+
+        return redirect("predictions:enter_scores")
+
+    matches = Match.objects.filter(
+        match_date__lte=today,
+        predicted=True,
+        postponed=False,
+        home_score__isnull=True,
+        away_score__isnull=True,
+    )
+    matches = sorted(
+        matches,
+        key=lambda m: (m.match_date, _league_sort_key(m.league), m.home_team),
+    )
+
+    # Group into one section per day, in date order.
+    days = []
+    for match in matches:
+        if not days or days[-1]["date"] != match.match_date:
+            days.append({"date": match.match_date, "matches": []})
+        days[-1]["matches"].append(match)
+
+    return render(request, "predictions/enter_scores.html", {"days": days})
